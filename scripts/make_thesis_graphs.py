@@ -27,6 +27,7 @@ CV_PATH = PROJECT_ROOT / "ml_outputs/cv_summary.csv"
 PREDICTIONS_PATH = PROJECT_ROOT / "ml_outputs/test_predictions.csv"
 BEST_PATH = PROJECT_ROOT / "ml_outputs/best_models_summary.csv"
 GRAPH_DIR = PROJECT_ROOT / "ml_outputs/thesis_graphs"
+ALL_MODEL_DIR = GRAPH_DIR / "all_models_predicted_vs_actual"
 PDF_PATH = GRAPH_DIR / "thesis_graph_pack.pdf"
 
 TARGETS = ["Porosity", "Permeability k", "Water Saturation Sw"]
@@ -56,6 +57,13 @@ def save(fig: plt.Figure, name: str, pdf: PdfPages) -> None:
     fig.tight_layout()
     fig.savefig(GRAPH_DIR / name, bbox_inches="tight")
     pdf.savefig(fig, bbox_inches="tight")
+    plt.close(fig)
+
+
+def save_png_only(fig: plt.Figure, path: Path) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fig.tight_layout()
+    fig.savefig(path, bbox_inches="tight")
     plt.close(fig)
 
 
@@ -209,6 +217,53 @@ def prediction_panels(predictions: pd.DataFrame, best: pd.DataFrame, pdf: PdfPag
     save(fig, "08_best_models_residuals_by_depth_panel.png", pdf)
 
 
+def all_model_prediction_graphs(predictions: pd.DataFrame, pdf: PdfPages) -> None:
+    model_order = [
+        "Baseline Mean",
+        "Ridge Regression",
+        "Random Forest",
+        "Extra Trees",
+        "SVR RBF",
+        "ANN Deep MLP",
+        "XGBoost",
+    ]
+
+    for target in TARGETS:
+        target_predictions = predictions[predictions["Target"] == target].copy()
+        models = [m for m in model_order if m in set(target_predictions["Model"])]
+
+        fig, axes = plt.subplots(3, 3, figsize=(14, 12))
+        axes_flat = axes.ravel()
+        for ax, model in zip(axes_flat, models):
+            subset = target_predictions[target_predictions["Model"] == model]
+            ax.scatter(subset["Actual"], subset["Predicted"], s=8, alpha=0.58, color="#264653")
+            mn = min(subset["Actual"].min(), subset["Predicted"].min())
+            mx = max(subset["Actual"].max(), subset["Predicted"].max())
+            ax.plot([mn, mx], [mn, mx], color="#b23a48", linewidth=1.0)
+            ax.set_title(model)
+            ax.set_xlabel("Actual")
+            ax.set_ylabel("Predicted")
+        for ax in axes_flat[len(models) :]:
+            ax.axis("off")
+        fig.suptitle(f"All Models Predicted vs Actual - {target}")
+        save(fig, f"12_all_models_predicted_vs_actual_{slug(target)}.png", pdf)
+
+        for model in models:
+            subset = target_predictions[target_predictions["Model"] == model]
+            fig, ax = plt.subplots(figsize=(6.2, 5.4))
+            ax.scatter(subset["Actual"], subset["Predicted"], s=12, alpha=0.64, color="#264653")
+            mn = min(subset["Actual"].min(), subset["Predicted"].min())
+            mx = max(subset["Actual"].max(), subset["Predicted"].max())
+            ax.plot([mn, mx], [mn, mx], color="#b23a48", linewidth=1.2)
+            ax.set_xlabel("Actual")
+            ax.set_ylabel("Predicted")
+            ax.set_title(f"{target} - {model} Predicted vs Actual")
+            save_png_only(
+                fig,
+                ALL_MODEL_DIR / f"{slug(target)}__{slug(model)}__predicted_vs_actual.png",
+            )
+
+
 def reservoir_quality_crossplots(data: pd.DataFrame, pdf: PdfPages) -> None:
     fig, ax = plt.subplots(figsize=(7.2, 5.6))
     sc = ax.scatter(
@@ -288,6 +343,7 @@ def main() -> None:
         model_comparison(scores, pdf)
         cv_comparison(cv, pdf)
         prediction_panels(predictions, best, pdf)
+        all_model_prediction_graphs(predictions, pdf)
         reservoir_quality_crossplots(data, pdf)
         best_feature_importance(best, pdf)
 

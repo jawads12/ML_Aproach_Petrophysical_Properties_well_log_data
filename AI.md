@@ -183,6 +183,10 @@ Generated figures:
 - `06_depth_ordered_cv_r2.png`: five-fold depth-ordered CV R2 comparison with standard deviation.
 - `07_best_models_predicted_vs_actual_panel.png`: predicted-versus-actual panels for the best model of each target.
 - `08_best_models_residuals_by_depth_panel.png`: residuals versus depth for the best model of each target.
+- `12_all_models_predicted_vs_actual_porosity.png`: predicted-versus-actual comparison for all porosity models.
+- `12_all_models_predicted_vs_actual_permeability_k.png`: predicted-versus-actual comparison for all permeability models.
+- `12_all_models_predicted_vs_actual_water_saturation_sw.png`: predicted-versus-actual comparison for all water-saturation models.
+- `all_models_predicted_vs_actual/`: 21 individual predicted-versus-actual graphs, one for every target-model combination.
 - `09_porosity_permeability_sw_crossplot.png`: reservoir-quality crossplot of porosity versus permeability colored by Sw.
 - `10_neutron_density_porosity_crossplot.png`: NPHI-RHOB crossplot colored by porosity.
 - `11_best_model_feature_importance_panel.png`: most influential input features for the best models.
