@@ -1,0 +1,32 @@
+[
+  {
+    "Target": "Porosity",
+    "BestModel": "Ridge Regression",
+    "Test_R2": 0.9566996669378607,
+    "Test_RMSE": 0.0055354245158151915,
+    "Test_MAE": 0.002216823754539849,
+    "Test_MAPE_percent": 1.0731403823382413,
+    "Test_Pearson_r": 0.9853043615856806,
+    "SavedModel": "ml_outputs/models/best_porosity_ridge_regression.joblib"
+  },
+  {
+    "Target": "Permeability k",
+    "BestModel": "Ridge Regression",
+    "Test_R2": 0.3903958829085281,
+    "Test_RMSE": 312.10912815567775,
+    "Test_MAE": 17.476746553479813,
+    "Test_MAPE_percent": 5.477464755921804,
+    "Test_Pearson_r": 0.9492697092263557,
+    "SavedModel": "ml_outputs/models/best_permeability_k_ridge_regression.joblib"
+  },
+  {
+    "Target": "Water Saturation Sw",
+    "BestModel": "Ridge Regression",
+    "Test_R2": 0.9228323556085319,
+    "Test_RMSE": 0.03971373686336332,
+    "Test_MAE": 0.022000451090477748,
+    "Test_MAPE_percent": 3.3397076670279477,
+    "Test_Pearson_r": 0.9731571175427164,
+    "SavedModel": "ml_outputs/models/best_water_saturation_sw_ridge_regression.joblib"
+  }
+]

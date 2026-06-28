@@ -1,0 +1,4 @@
+Target,BestModel,Test_R2,Test_RMSE,Test_MAE,Test_MAPE_percent,Test_Pearson_r,SavedModel
+Porosity,Ridge Regression,0.9566996669378607,0.0055354245158151915,0.002216823754539849,1.0731403823382413,0.9853043615856806,ml_outputs/models/best_porosity_ridge_regression.joblib
+Permeability k,Ridge Regression,0.3903958829085281,312.10912815567775,17.476746553479813,5.477464755921804,0.9492697092263557,ml_outputs/models/best_permeability_k_ridge_regression.joblib
+Water Saturation Sw,Ridge Regression,0.9228323556085319,0.03971373686336332,0.022000451090477748,3.3397076670279477,0.9731571175427164,ml_outputs/models/best_water_saturation_sw_ridge_regression.joblib
