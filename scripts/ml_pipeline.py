@@ -581,7 +581,25 @@ Additional validation was performed with 5-fold `TimeSeriesSplit` on the trainin
 
 {markdown_table(cv_table, ["Target", "Model", "CV_R2_mean", "CV_R2_std", "CV_RMSE_mean", "CV_RMSE_std", "CV_MAE_mean", "CV_MAPE_percent_mean"])}
 
-## 11. Output Files
+## 11. Thesis Graphs Generated
+
+All thesis-ready graphs were saved in `ml_outputs/thesis_graphs/`. A combined PDF graph pack is also available at `ml_outputs/thesis_graphs/thesis_graph_pack.pdf`.
+
+Generated figures:
+
+- `01_target_property_distributions.png`: histograms for porosity, log permeability, and water saturation.
+- `02_depth_profiles_logs_and_targets.png`: well-log and reservoir-property profiles versus depth.
+- `03_correlation_heatmap.png`: Pearson correlation heatmap for major logs and target properties.
+- `04_model_comparison_test_r2.png`: depth-holdout test R2 comparison for all algorithms.
+- `05_model_comparison_test_mae.png`: depth-holdout test MAE comparison for all algorithms.
+- `06_depth_ordered_cv_r2.png`: five-fold depth-ordered CV R2 comparison with standard deviation.
+- `07_best_models_predicted_vs_actual_panel.png`: predicted-versus-actual panels for the best model of each target.
+- `08_best_models_residuals_by_depth_panel.png`: residuals versus depth for the best model of each target.
+- `09_porosity_permeability_sw_crossplot.png`: reservoir-quality crossplot of porosity versus permeability colored by Sw.
+- `10_neutron_density_porosity_crossplot.png`: NPHI-RHOB crossplot colored by porosity.
+- `11_best_model_feature_importance_panel.png`: most influential input features for the best models.
+
+## 12. Output Files
 
 - `ml_outputs/model_scores.csv`: validation and test metrics for every model-target combination.
 - `ml_outputs/cv_fold_scores.csv`: fold-by-fold depth-ordered cross-validation metrics.
@@ -592,16 +610,18 @@ Additional validation was performed with 5-fold `TimeSeriesSplit` on the trainin
 - `ml_outputs/ml_results_workbook.xlsx`: Excel workbook containing best models, holdout scores, CV scores, dataset summary, and test predictions.
 - `ml_outputs/models/`: saved best model files.
 - `ml_outputs/figures/`: predicted-vs-actual, residual, and feature-importance/coefficient plots.
+- `ml_outputs/thesis_graphs/`: thesis graph PNGs and combined PDF graph pack.
 - `requirements.txt`: Python package versions used for the ML run.
 
-## 12. Recommended Thesis Interpretation
+## 13. Recommended Thesis Interpretation
 
 Use the depth-holdout test scores as the main performance evidence because they represent prediction into an unseen depth interval. Use the 5-fold depth-ordered CV scores as supporting evidence for model stability. If the thesis later obtains additional measured core porosity, measured permeability, or measured water saturation over more depths, rerun this pipeline using those measured values as targets to establish independent laboratory-calibrated prediction accuracy.
 
-## 13. Reproduction Command
+## 14. Reproduction Commands
 
 ```bash
 .venv/bin/python scripts/ml_pipeline.py
+.venv/bin/python scripts/make_thesis_graphs.py
 ```
 """
     REPORT_PATH.write_text(text, encoding="utf-8")
