@@ -1,0 +1,13 @@
+Previous thesis preprocessing step,Our implementation,Status
+Data import and descriptive statistics,"Imported final Excel sheet, numeric conversion, dataset_summary.csv",Done
+Missing-value check and mean imputation,Missing values counted in preprocessing_audit.csv; mean imputation used inside all model pipelines,Done
+Input-feature outlier treatment using IQR,IQRClipper applied inside each model pipeline using training data only,Done
+Target invalid-value removal,Target physical-range issues are flagged in preprocessing_audit.csv but targets are not altered to avoid artificial score inflation,"Flagged, not manipulated"
+Duplicate full-row removal,Full duplicate rows removed before modeling,Done
+Noisy-data detection using IsolationForest,IsolationForest applied to input features only; 2.5% anomalous input rows removed,Done
+Binning/noise impact reduction,IQR clipping plus Min-Max normalization reduces feature noise while preserving continuous log values for regression,Adapted
+Min-Max normalization,MinMaxScaler applied inside every model pipeline,Done
+Correlation heatmap feature selection |r| >= 0.20,Target-specific correlation feature selection applied inside train/validation folds,Done
+Remove/check highly correlated features |r| >= 0.85,Redundant high-correlation features reduced during feature selection,Done
+70/15/15 train-validation-test split,"70/15/15 split retained, sorted by depth for stricter unseen-depth testing","Done, stricter"
+"Linear Regression, SVR, RF, XGBoost, ANN","Linear Regression, SVR, Random Forest, XGBoost, ANN plus Ridge, Extra Trees, Baseline",Done and expanded

@@ -220,6 +220,7 @@ def prediction_panels(predictions: pd.DataFrame, best: pd.DataFrame, pdf: PdfPag
 def all_model_prediction_graphs(predictions: pd.DataFrame, pdf: PdfPages) -> None:
     model_order = [
         "Baseline Mean",
+        "Linear Regression",
         "Ridge Regression",
         "Random Forest",
         "Extra Trees",

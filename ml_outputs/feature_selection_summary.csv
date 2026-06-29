@@ -1,0 +1,223 @@
+Feature,TargetCorrelation,AbsCorrelation,Selected,Target,SelectionStage
+RHOB,-0.7917498505426036,0.7917498505426036,True,Porosity,validation_train_only
+RHOB_roll5_mean,-0.7799979803567341,0.7799979803567341,False,Porosity,validation_train_only
+RHOB_roll15_mean,-0.7418091092741621,0.7418091092741621,False,Porosity,validation_train_only
+NPHI_minus_DRHO,0.7311079613393938,0.7311079613393938,True,Porosity,validation_train_only
+NPHI,0.729238987423225,0.729238987423225,False,Porosity,validation_train_only
+NPHI_roll5_mean,0.7114612637409116,0.7114612637409116,False,Porosity,validation_train_only
+NPHI_roll15_mean,0.6432431643893705,0.6432431643893705,False,Porosity,validation_train_only
+DT,0.5955614674385685,0.5955614674385685,True,Porosity,validation_train_only
+PEF,-0.5929819159057992,0.5929819159057992,True,Porosity,validation_train_only
+DT_roll5_mean,0.5886823177904501,0.5886823177904501,False,Porosity,validation_train_only
+SP,-0.567498184065418,0.567498184065418,True,Porosity,validation_train_only
+NPHI_RHOB_product,0.5576113122796318,0.5576113122796318,False,Porosity,validation_train_only
+DT_roll15_mean,0.5540135115459203,0.5540135115459203,False,Porosity,validation_train_only
+DEPT,-0.5497942336040699,0.5497942336040699,True,Porosity,validation_train_only
+DEPT_normalized,-0.5497942336040696,0.5497942336040696,False,Porosity,validation_train_only
+DRHO,-0.3925953512705716,0.3925953512705716,True,Porosity,validation_train_only
+CALI,-0.37375503406170807,0.37375503406170807,True,Porosity,validation_train_only
+GR_roll15_mean,-0.36150756912495957,0.36150756912495957,True,Porosity,validation_train_only
+GR_roll5_mean,-0.3350065208694492,0.3350065208694492,False,Porosity,validation_train_only
+log10_MSFL,0.3293022515614571,0.3293022515614571,True,Porosity,validation_train_only
+GR,-0.3183889408215225,0.3183889408215225,False,Porosity,validation_train_only
+DT_roll15_std,-0.2833160383597444,0.2833160383597444,True,Porosity,validation_train_only
+RHOB_roll15_std,-0.27081354593390583,0.27081354593390583,True,Porosity,validation_train_only
+log10_SFLU,0.2654133042002747,0.2654133042002747,True,Porosity,validation_train_only
+MSFL,0.2525440367455844,0.2525440367455844,False,Porosity,validation_train_only
+log10_ILD,0.22954433529943083,0.22954433529943083,False,Porosity,validation_train_only
+SFLU,0.14311826748044099,0.14311826748044099,False,Porosity,validation_train_only
+ILD_roll15_mean,0.10748719620647855,0.10748719620647855,False,Porosity,validation_train_only
+ILD_roll5_mean,0.10077509193005696,0.10077509193005696,False,Porosity,validation_train_only
+ILD,0.09880978302320456,0.09880978302320456,False,Porosity,validation_train_only
+GR_roll15_std,0.08156939501627876,0.08156939501627876,False,Porosity,validation_train_only
+NPHI_roll15_std,0.06952867944846888,0.06952867944846888,False,Porosity,validation_train_only
+GR_DT_product,-0.06227568489912831,0.06227568489912831,False,Porosity,validation_train_only
+ILD_to_SFLU,0.04405374861977793,0.04405374861977793,False,Porosity,validation_train_only
+ILD_to_MSFL,0.008071877267986442,0.008071877267986442,False,Porosity,validation_train_only
+ILD_roll15_std,0.004086592533005281,0.004086592533005281,False,Porosity,validation_train_only
+MSFL_to_SFLU,-0.003208409721358016,0.003208409721358016,False,Porosity,validation_train_only
+RHOB,-0.7942037395165041,0.7942037395165041,True,Porosity,test_train_validation
+RHOB_roll5_mean,-0.783216916111238,0.783216916111238,False,Porosity,test_train_validation
+RHOB_roll15_mean,-0.7508603988009775,0.7508603988009775,False,Porosity,test_train_validation
+NPHI_minus_DRHO,0.7048085603812757,0.7048085603812757,True,Porosity,test_train_validation
+NPHI,0.7022816140574968,0.7022816140574968,False,Porosity,test_train_validation
+NPHI_roll5_mean,0.685201253834267,0.685201253834267,False,Porosity,test_train_validation
+DT,0.6669084807335831,0.6669084807335831,True,Porosity,test_train_validation
+DT_roll5_mean,0.6634138835072775,0.6634138835072775,False,Porosity,test_train_validation
+DEPT,-0.6448501011408507,0.6448501011408507,True,Porosity,test_train_validation
+DEPT_normalized,-0.6448501011408504,0.6448501011408504,False,Porosity,test_train_validation
+DT_roll15_mean,0.6362670170156506,0.6362670170156506,False,Porosity,test_train_validation
+NPHI_roll15_mean,0.6235920959281296,0.6235920959281296,False,Porosity,test_train_validation
+PEF,-0.6196641493120839,0.6196641493120839,True,Porosity,test_train_validation
+SP,-0.5656078092035272,0.5656078092035272,True,Porosity,test_train_validation
+NPHI_RHOB_product,0.5062626815555235,0.5062626815555235,False,Porosity,test_train_validation
+GR_roll15_mean,-0.4546976023409346,0.4546976023409346,True,Porosity,test_train_validation
+GR_roll5_mean,-0.43083870510428457,0.43083870510428457,False,Porosity,test_train_validation
+DRHO,-0.4216342669106237,0.4216342669106237,True,Porosity,test_train_validation
+CALI,-0.4166371332652422,0.4166371332652422,True,Porosity,test_train_validation
+GR,-0.4151532558077348,0.4151532558077348,False,Porosity,test_train_validation
+log10_MSFL,0.34167181171160615,0.34167181171160615,True,Porosity,test_train_validation
+log10_SFLU,0.29089185529836414,0.29089185529836414,True,Porosity,test_train_validation
+log10_ILD,0.2703410262831811,0.2703410262831811,True,Porosity,test_train_validation
+MSFL,0.25642520645901945,0.25642520645901945,False,Porosity,test_train_validation
+RHOB_roll15_std,-0.24790442475267582,0.24790442475267582,True,Porosity,test_train_validation
+DT_roll15_std,-0.23819032861623168,0.23819032861623168,True,Porosity,test_train_validation
+SFLU,0.18002217717107113,0.18002217717107113,False,Porosity,test_train_validation
+ILD_roll15_mean,0.15722725475394408,0.15722725475394408,False,Porosity,test_train_validation
+ILD_roll5_mean,0.14894475867908127,0.14894475867908127,False,Porosity,test_train_validation
+GR_DT_product,-0.14696239817774615,0.14696239817774615,False,Porosity,test_train_validation
+ILD,0.14632786100436193,0.14632786100436193,False,Porosity,test_train_validation
+NPHI_roll15_std,0.10470635915363456,0.10470635915363456,False,Porosity,test_train_validation
+GR_roll15_std,0.10068615510533986,0.10068615510533986,False,Porosity,test_train_validation
+ILD_to_SFLU,0.057171842980474875,0.057171842980474875,False,Porosity,test_train_validation
+ILD_roll15_std,0.038451824795513144,0.038451824795513144,False,Porosity,test_train_validation
+MSFL_to_SFLU,0.024325494673825818,0.024325494673825818,False,Porosity,test_train_validation
+ILD_to_MSFL,0.011738044659036013,0.011738044659036013,False,Porosity,test_train_validation
+ILD_roll15_mean,0.47839065820586724,0.47839065820586724,True,Permeability k,validation_train_only
+ILD_roll5_mean,0.4672038068831163,0.4672038068831163,False,Permeability k,validation_train_only
+ILD,0.4586015589205347,0.4586015589205347,False,Permeability k,validation_train_only
+DT_roll15_mean,0.4423808226427173,0.4423808226427173,True,Permeability k,validation_train_only
+log10_ILD,0.43361029755717473,0.43361029755717473,False,Permeability k,validation_train_only
+DT_roll5_mean,0.43334870031184014,0.43334870031184014,False,Permeability k,validation_train_only
+DT,0.42348264956404996,0.42348264956404996,False,Permeability k,validation_train_only
+ILD_to_MSFL,0.4223115674931733,0.4223115674931733,False,Permeability k,validation_train_only
+SFLU,0.41077814356655595,0.41077814356655595,False,Permeability k,validation_train_only
+NPHI_roll15_std,0.39940143733106115,0.39940143733106115,True,Permeability k,validation_train_only
+ILD_to_SFLU,0.37817796550867877,0.37817796550867877,True,Permeability k,validation_train_only
+log10_SFLU,0.37429886768979964,0.37429886768979964,True,Permeability k,validation_train_only
+ILD_roll15_std,0.36866571017287914,0.36866571017287914,True,Permeability k,validation_train_only
+NPHI_minus_DRHO,0.35378920076417686,0.35378920076417686,True,Permeability k,validation_train_only
+NPHI,0.35316509597480666,0.35316509597480666,False,Permeability k,validation_train_only
+NPHI_roll5_mean,0.33233519058945693,0.33233519058945693,False,Permeability k,validation_train_only
+DEPT_normalized,-0.30005173462003454,0.30005173462003454,True,Permeability k,validation_train_only
+DEPT,-0.3000517346200344,0.3000517346200344,False,Permeability k,validation_train_only
+MSFL_to_SFLU,-0.28570463713746674,0.28570463713746674,True,Permeability k,validation_train_only
+RHOB_roll5_mean,-0.2853391681617696,0.2853391681617696,True,Permeability k,validation_train_only
+RHOB,-0.2844282812761289,0.2844282812761289,False,Permeability k,validation_train_only
+RHOB_roll15_mean,-0.28299661388840436,0.28299661388840436,False,Permeability k,validation_train_only
+NPHI_RHOB_product,0.2809500174302506,0.2809500174302506,False,Permeability k,validation_train_only
+NPHI_roll15_mean,0.27932300115961917,0.27932300115961917,False,Permeability k,validation_train_only
+SP,-0.24857798136441664,0.24857798136441664,True,Permeability k,validation_train_only
+log10_MSFL,0.21223611321112698,0.21223611321112698,True,Permeability k,validation_train_only
+MSFL,0.2107908807301304,0.2107908807301304,False,Permeability k,validation_train_only
+PEF,-0.18584459047524116,0.18584459047524116,False,Permeability k,validation_train_only
+DRHO,-0.14018185190763321,0.14018185190763321,False,Permeability k,validation_train_only
+CALI,-0.12435482528878486,0.12435482528878486,False,Permeability k,validation_train_only
+GR_DT_product,0.10346030302168448,0.10346030302168448,False,Permeability k,validation_train_only
+GR_roll15_mean,-0.08079862131422598,0.08079862131422598,False,Permeability k,validation_train_only
+GR_roll5_mean,-0.08071459385490067,0.08071459385490067,False,Permeability k,validation_train_only
+GR,-0.074795831327412,0.074795831327412,False,Permeability k,validation_train_only
+RHOB_roll15_std,-0.057148072888837186,0.057148072888837186,False,Permeability k,validation_train_only
+DT_roll15_std,-0.023659114356169793,0.023659114356169793,False,Permeability k,validation_train_only
+GR_roll15_std,0.008042830380254756,0.008042830380254756,False,Permeability k,validation_train_only
+ILD_roll15_mean,0.48037002579121296,0.48037002579121296,True,Permeability k,test_train_validation
+ILD_roll5_mean,0.4693800840834648,0.4693800840834648,False,Permeability k,test_train_validation
+ILD,0.46095379581438506,0.46095379581438506,False,Permeability k,test_train_validation
+DT_roll15_mean,0.4408667313574847,0.4408667313574847,True,Permeability k,test_train_validation
+DT_roll5_mean,0.4333249688775293,0.4333249688775293,False,Permeability k,test_train_validation
+log10_ILD,0.4302702882439505,0.4302702882439505,False,Permeability k,test_train_validation
+DT,0.4247536125851081,0.4247536125851081,False,Permeability k,test_train_validation
+SFLU,0.4044367718439466,0.4044367718439466,False,Permeability k,test_train_validation
+ILD_to_MSFL,0.4037334741393063,0.4037334741393063,True,Permeability k,test_train_validation
+NPHI_roll15_std,0.39048190410212696,0.39048190410212696,True,Permeability k,test_train_validation
+log10_SFLU,0.36628593086642497,0.36628593086642497,True,Permeability k,test_train_validation
+ILD_roll15_std,0.3605346193139997,0.3605346193139997,True,Permeability k,test_train_validation
+ILD_to_SFLU,0.3485299949340265,0.3485299949340265,False,Permeability k,test_train_validation
+NPHI_minus_DRHO,0.340704141977649,0.340704141977649,True,Permeability k,test_train_validation
+NPHI,0.3398438223022738,0.3398438223022738,False,Permeability k,test_train_validation
+NPHI_roll5_mean,0.32033396355012217,0.32033396355012217,False,Permeability k,test_train_validation
+DEPT,-0.30342510263049133,0.30342510263049133,True,Permeability k,test_train_validation
+DEPT_normalized,-0.3034251026304912,0.3034251026304912,False,Permeability k,test_train_validation
+RHOB_roll5_mean,-0.29326025894289354,0.29326025894289354,True,Permeability k,test_train_validation
+RHOB,-0.2928869083743155,0.2928869083743155,False,Permeability k,test_train_validation
+RHOB_roll15_mean,-0.291004608623494,0.291004608623494,False,Permeability k,test_train_validation
+NPHI_roll15_mean,0.2725194904569333,0.2725194904569333,False,Permeability k,test_train_validation
+NPHI_RHOB_product,0.25674310417486207,0.25674310417486207,False,Permeability k,test_train_validation
+MSFL_to_SFLU,-0.25045823152035585,0.25045823152035585,True,Permeability k,test_train_validation
+SP,-0.23526851259949272,0.23526851259949272,True,Permeability k,test_train_validation
+log10_MSFL,0.20882562775451108,0.20882562775451108,True,Permeability k,test_train_validation
+PEF,-0.20803495098114852,0.20803495098114852,True,Permeability k,test_train_validation
+MSFL,0.19975230278835612,0.19975230278835612,False,Permeability k,test_train_validation
+DRHO,-0.14857783234804628,0.14857783234804628,False,Permeability k,test_train_validation
+CALI,-0.14700120072728326,0.14700120072728326,False,Permeability k,test_train_validation
+GR_roll15_mean,-0.124154136686352,0.124154136686352,False,Permeability k,test_train_validation
+GR_roll5_mean,-0.12242187002662241,0.12242187002662241,False,Permeability k,test_train_validation
+GR,-0.11642935373251048,0.11642935373251048,False,Permeability k,test_train_validation
+GR_DT_product,0.06067030213464916,0.06067030213464916,False,Permeability k,test_train_validation
+RHOB_roll15_std,-0.05903721310863288,0.05903721310863288,False,Permeability k,test_train_validation
+DT_roll15_std,-0.023788065099717585,0.023788065099717585,False,Permeability k,test_train_validation
+GR_roll15_std,0.019512368599000417,0.019512368599000417,False,Permeability k,test_train_validation
+log10_ILD,-0.8804869504946357,0.8804869504946357,True,Water Saturation Sw,validation_train_only
+log10_SFLU,-0.794349459830429,0.794349459830429,False,Water Saturation Sw,validation_train_only
+RHOB_roll5_mean,0.7351382327978985,0.7351382327978985,True,Water Saturation Sw,validation_train_only
+RHOB_roll15_mean,0.732768403675434,0.732768403675434,False,Water Saturation Sw,validation_train_only
+RHOB,0.729116908771963,0.729116908771963,False,Water Saturation Sw,validation_train_only
+SFLU,-0.7165383234748438,0.7165383234748438,False,Water Saturation Sw,validation_train_only
+DT_roll15_mean,-0.7111929826300202,0.7111929826300202,True,Water Saturation Sw,validation_train_only
+DT_roll5_mean,-0.7089995866476232,0.7089995866476232,False,Water Saturation Sw,validation_train_only
+DT,-0.6996869379486517,0.6996869379486517,False,Water Saturation Sw,validation_train_only
+ILD_roll15_mean,-0.678394603581263,0.678394603581263,False,Water Saturation Sw,validation_train_only
+ILD_roll5_mean,-0.6715913642704726,0.6715913642704726,False,Water Saturation Sw,validation_train_only
+ILD,-0.6687628555166879,0.6687628555166879,False,Water Saturation Sw,validation_train_only
+DEPT_normalized,0.579422712008831,0.579422712008831,True,Water Saturation Sw,validation_train_only
+DEPT,0.5794227120088309,0.5794227120088309,False,Water Saturation Sw,validation_train_only
+log10_MSFL,-0.5700726972358982,0.5700726972358982,True,Water Saturation Sw,validation_train_only
+ILD_to_SFLU,-0.5500103563546667,0.5500103563546667,True,Water Saturation Sw,validation_train_only
+PEF,0.5461603508307884,0.5461603508307884,True,Water Saturation Sw,validation_train_only
+MSFL,-0.5359609626625067,0.5359609626625067,False,Water Saturation Sw,validation_train_only
+ILD_to_MSFL,-0.5359522014395989,0.5359522014395989,False,Water Saturation Sw,validation_train_only
+MSFL_to_SFLU,0.5224783707072217,0.5224783707072217,True,Water Saturation Sw,validation_train_only
+SP,0.4705280808011159,0.4705280808011159,True,Water Saturation Sw,validation_train_only
+ILD_roll15_std,-0.4299282033988642,0.4299282033988642,True,Water Saturation Sw,validation_train_only
+GR_roll15_mean,0.3817114899960371,0.3817114899960371,True,Water Saturation Sw,validation_train_only
+GR_roll5_mean,0.3593285724609094,0.3593285724609094,False,Water Saturation Sw,validation_train_only
+DRHO,0.3438212364236432,0.3438212364236432,True,Water Saturation Sw,validation_train_only
+GR,0.34214731817211724,0.34214731817211724,False,Water Saturation Sw,validation_train_only
+CALI,0.33635852797215515,0.33635852797215515,True,Water Saturation Sw,validation_train_only
+RHOB_roll15_std,0.24465373449586808,0.24465373449586808,True,Water Saturation Sw,validation_train_only
+DT_roll15_std,0.1379275689875703,0.1379275689875703,False,Water Saturation Sw,validation_train_only
+NPHI_minus_DRHO,-0.12075105964298712,0.12075105964298712,False,Water Saturation Sw,validation_train_only
+NPHI,-0.11887204252806177,0.11887204252806177,False,Water Saturation Sw,validation_train_only
+NPHI_roll5_mean,-0.10024026839082427,0.10024026839082427,False,Water Saturation Sw,validation_train_only
+GR_roll15_std,-0.08941608522631772,0.08941608522631772,False,Water Saturation Sw,validation_train_only
+NPHI_roll15_mean,-0.07180765480602172,0.07180765480602172,False,Water Saturation Sw,validation_train_only
+NPHI_roll15_std,-0.06986604198724357,0.06986604198724357,False,Water Saturation Sw,validation_train_only
+NPHI_RHOB_product,0.049088832482191876,0.049088832482191876,False,Water Saturation Sw,validation_train_only
+GR_DT_product,0.04560996714088353,0.04560996714088353,False,Water Saturation Sw,validation_train_only
+log10_ILD,-0.8854923281234414,0.8854923281234414,True,Water Saturation Sw,test_train_validation
+log10_SFLU,-0.7319000653491923,0.7319000653491923,True,Water Saturation Sw,test_train_validation
+DT_roll15_mean,-0.7267395662322146,0.7267395662322146,True,Water Saturation Sw,test_train_validation
+DT_roll5_mean,-0.7242599787256089,0.7242599787256089,False,Water Saturation Sw,test_train_validation
+DT,-0.7153351669111028,0.7153351669111028,False,Water Saturation Sw,test_train_validation
+RHOB_roll5_mean,0.6941196462955441,0.6941196462955441,True,Water Saturation Sw,test_train_validation
+RHOB,0.6913677696133419,0.6913677696133419,False,Water Saturation Sw,test_train_validation
+RHOB_roll15_mean,0.6899449060094828,0.6899449060094828,False,Water Saturation Sw,test_train_validation
+ILD_roll15_mean,-0.687752301963034,0.687752301963034,False,Water Saturation Sw,test_train_validation
+SFLU,-0.6838315477036863,0.6838315477036863,False,Water Saturation Sw,test_train_validation
+ILD_roll5_mean,-0.6805715855492666,0.6805715855492666,False,Water Saturation Sw,test_train_validation
+ILD,-0.6773532087992464,0.6773532087992464,False,Water Saturation Sw,test_train_validation
+DEPT,0.5920698419454484,0.5920698419454484,True,Water Saturation Sw,test_train_validation
+DEPT_normalized,0.5920698419454479,0.5920698419454479,False,Water Saturation Sw,test_train_validation
+ILD_to_SFLU,-0.5569400583056117,0.5569400583056117,True,Water Saturation Sw,test_train_validation
+ILD_to_MSFL,-0.527947455290291,0.527947455290291,False,Water Saturation Sw,test_train_validation
+PEF,0.5184945862919693,0.5184945862919693,True,Water Saturation Sw,test_train_validation
+MSFL_to_SFLU,0.4982940430552514,0.4982940430552514,True,Water Saturation Sw,test_train_validation
+log10_MSFL,-0.4742626194559177,0.4742626194559177,True,Water Saturation Sw,test_train_validation
+ILD_roll15_std,-0.4397390284945341,0.4397390284945341,True,Water Saturation Sw,test_train_validation
+MSFL,-0.4209544796291305,0.4209544796291305,False,Water Saturation Sw,test_train_validation
+SP,0.411817852851803,0.411817852851803,True,Water Saturation Sw,test_train_validation
+GR_roll15_mean,0.3993175612765807,0.3993175612765807,True,Water Saturation Sw,test_train_validation
+GR_roll5_mean,0.3824824260039154,0.3824824260039154,False,Water Saturation Sw,test_train_validation
+GR,0.36921457532708024,0.36921457532708024,False,Water Saturation Sw,test_train_validation
+CALI,0.3492642442944124,0.3492642442944124,True,Water Saturation Sw,test_train_validation
+DRHO,0.34683298589118006,0.34683298589118006,True,Water Saturation Sw,test_train_validation
+RHOB_roll15_std,0.2008228659188306,0.2008228659188306,True,Water Saturation Sw,test_train_validation
+NPHI_minus_DRHO,-0.17620048220920184,0.17620048220920184,False,Water Saturation Sw,test_train_validation
+NPHI,-0.1739901110436932,0.1739901110436932,False,Water Saturation Sw,test_train_validation
+NPHI_roll5_mean,-0.16082026218158457,0.16082026218158457,False,Water Saturation Sw,test_train_validation
+NPHI_roll15_mean,-0.14119804571330394,0.14119804571330394,False,Water Saturation Sw,test_train_validation
+GR_roll15_std,-0.11550291643585715,0.11550291643585715,False,Water Saturation Sw,test_train_validation
+DT_roll15_std,0.11230733397094837,0.11230733397094837,False,Water Saturation Sw,test_train_validation
+NPHI_roll15_std,-0.10787413984972224,0.10787413984972224,False,Water Saturation Sw,test_train_validation
+GR_DT_product,0.08670383697243134,0.08670383697243134,False,Water Saturation Sw,test_train_validation
+NPHI_RHOB_product,-0.0015657800532840405,0.0015657800532840405,False,Water Saturation Sw,test_train_validation

@@ -25,11 +25,11 @@ import joblib
 import matplotlib
 import numpy as np
 import pandas as pd
-from sklearn.base import clone
+from sklearn.base import BaseEstimator, TransformerMixin, clone
 from sklearn.dummy import DummyRegressor
-from sklearn.ensemble import ExtraTreesRegressor, RandomForestRegressor
+from sklearn.ensemble import ExtraTreesRegressor, IsolationForest, RandomForestRegressor
 from sklearn.impute import SimpleImputer
-from sklearn.linear_model import Ridge
+from sklearn.linear_model import LinearRegression, Ridge
 from sklearn.metrics import (
     explained_variance_score,
     mean_absolute_error,
@@ -40,7 +40,7 @@ from sklearn.metrics import (
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.neural_network import MLPRegressor
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.svm import SVR
 from sklearn.exceptions import ConvergenceWarning
 
@@ -88,6 +88,29 @@ BASE_FEATURES = [
     "NPHI",
 ]
 RANDOM_STATE = 42
+APPLY_INPUT_NOISE_FILTER = True
+NOISE_CONTAMINATION = 0.025
+PREPROCESSING_AUDIT: dict[str, int | float | str] = {}
+
+
+class IQRClipper(BaseEstimator, TransformerMixin):
+    """Clip input-feature outliers using training-set IQR limits."""
+
+    def __init__(self, factor: float = 1.5):
+        self.factor = factor
+
+    def fit(self, x, y=None):
+        arr = np.asarray(x, dtype=float)
+        q1 = np.nanpercentile(arr, 25, axis=0)
+        q3 = np.nanpercentile(arr, 75, axis=0)
+        iqr = q3 - q1
+        self.lower_ = q1 - self.factor * iqr
+        self.upper_ = q3 + self.factor * iqr
+        return self
+
+    def transform(self, x):
+        arr = np.asarray(x, dtype=float)
+        return np.clip(arr, self.lower_, self.upper_)
 
 
 def slugify(value: str) -> str:
@@ -100,8 +123,39 @@ def ensure_dirs() -> None:
         path.mkdir(parents=True, exist_ok=True)
 
 
+def flag_target_physical_ranges(df: pd.DataFrame) -> dict[str, int]:
+    return {
+        "porosity_gt_0_35": int((df["Porosity"] > 0.35).sum()),
+        "porosity_lt_0": int((df["Porosity"] < 0).sum()),
+        "permeability_gt_800": int((df["Permeability k"] > 800).sum()),
+        "permeability_lte_0": int((df["Permeability k"] <= 0).sum()),
+        "water_saturation_gt_1": int((df["Water Saturation Sw"] > 1.0).sum()),
+        "water_saturation_lt_0": int((df["Water Saturation Sw"] < 0).sum()),
+    }
+
+
+def remove_input_noise_rows(df: pd.DataFrame) -> pd.DataFrame:
+    if not APPLY_INPUT_NOISE_FILTER:
+        PREPROCESSING_AUDIT["isolation_forest_rows_removed"] = 0
+        return df
+
+    feature_matrix = df[BASE_FEATURES].replace([np.inf, -np.inf], np.nan)
+    feature_matrix = feature_matrix.fillna(feature_matrix.mean(numeric_only=True))
+    detector = IsolationForest(
+        contamination=NOISE_CONTAMINATION,
+        random_state=RANDOM_STATE,
+        n_estimators=200,
+    )
+    labels = detector.fit_predict(feature_matrix)
+    keep_mask = labels == 1
+    PREPROCESSING_AUDIT["isolation_forest_contamination"] = NOISE_CONTAMINATION
+    PREPROCESSING_AUDIT["isolation_forest_rows_removed"] = int((~keep_mask).sum())
+    return df.loc[keep_mask].reset_index(drop=True)
+
+
 def load_data() -> pd.DataFrame:
     df = pd.read_excel(SOURCE_WORKBOOK, sheet_name=SHEET_NAME)
+    PREPROCESSING_AUDIT["raw_rows"] = int(len(df))
     missing = [col for col in BASE_FEATURES + TARGETS if col not in df.columns]
     if missing:
         raise ValueError(f"Missing expected columns: {missing}")
@@ -111,7 +165,15 @@ def load_data() -> pd.DataFrame:
     for col in keep:
         df[col] = pd.to_numeric(df[col], errors="coerce")
     df = df.replace([np.inf, -np.inf], np.nan)
+    PREPROCESSING_AUDIT["initial_missing_values"] = int(df.isna().sum().sum())
+    PREPROCESSING_AUDIT["duplicate_full_rows_removed"] = int(df.duplicated().sum())
+    df = df.drop_duplicates(keep="first").reset_index(drop=True)
+    before_target_drop = len(df)
     df = df.dropna(subset=TARGETS + ["DEPT"]).sort_values("DEPT").reset_index(drop=True)
+    PREPROCESSING_AUDIT["rows_removed_missing_depth_or_target"] = int(before_target_drop - len(df))
+    PREPROCESSING_AUDIT.update(flag_target_physical_ranges(df))
+    df = remove_input_noise_rows(df).sort_values("DEPT").reset_index(drop=True)
+    PREPROCESSING_AUDIT["final_rows_after_previous_thesis_preprocessing"] = int(len(df))
     return df
 
 
@@ -160,21 +222,74 @@ def split_by_depth(df: pd.DataFrame) -> dict[str, np.ndarray]:
     }
 
 
+def select_features(
+    x_train: pd.DataFrame,
+    y_train: np.ndarray,
+    min_abs_corr: float = 0.20,
+    high_feature_corr: float = 0.85,
+    min_features: int = 8,
+) -> tuple[list[str], pd.DataFrame]:
+    x_numeric = x_train.copy().replace([np.inf, -np.inf], np.nan)
+    x_numeric = x_numeric.fillna(x_numeric.mean(numeric_only=True))
+    y = np.asarray(y_train, dtype=float)
+
+    corr_rows = []
+    for col in x_numeric.columns:
+        values = x_numeric[col].to_numpy(dtype=float)
+        if np.std(values) == 0 or np.std(y) == 0:
+            corr = 0.0
+        else:
+            corr = float(np.corrcoef(values, y)[0, 1])
+            if not np.isfinite(corr):
+                corr = 0.0
+        corr_rows.append({"Feature": col, "TargetCorrelation": corr, "AbsCorrelation": abs(corr)})
+
+    corr_df = pd.DataFrame(corr_rows).sort_values("AbsCorrelation", ascending=False)
+    selected = corr_df[corr_df["AbsCorrelation"] >= min_abs_corr]["Feature"].tolist()
+    if len(selected) < min_features:
+        selected = corr_df.head(min(min_features, len(corr_df)))["Feature"].tolist()
+
+    abs_corr_lookup = corr_df.set_index("Feature")["AbsCorrelation"].to_dict()
+    feature_corr = x_numeric[selected].corr().abs()
+    final_features: list[str] = []
+    for feature in selected:
+        redundant = False
+        for kept in final_features:
+            if feature_corr.loc[feature, kept] >= high_feature_corr:
+                if abs_corr_lookup[feature] <= abs_corr_lookup[kept]:
+                    redundant = True
+                    break
+        if not redundant:
+            final_features.append(feature)
+
+    if len(final_features) < min_features:
+        for feature in selected:
+            if feature not in final_features:
+                final_features.append(feature)
+            if len(final_features) >= min_features:
+                break
+
+    corr_df["Selected"] = corr_df["Feature"].isin(final_features)
+    return final_features, corr_df
+
+
 def build_models() -> dict[str, object]:
+    preprocess_steps = [
+        ("imputer", SimpleImputer(strategy="mean")),
+        ("iqr_clipper", IQRClipper(factor=1.5)),
+        ("scaler", MinMaxScaler()),
+    ]
     models: dict[str, object] = {
-        "Baseline Mean": Pipeline(
-            [("imputer", SimpleImputer(strategy="median")), ("model", DummyRegressor())]
+        "Baseline Mean": Pipeline(preprocess_steps + [("model", DummyRegressor())]),
+        "Linear Regression": Pipeline(
+            preprocess_steps + [("model", LinearRegression())]
         ),
         "Ridge Regression": Pipeline(
-            [
-                ("imputer", SimpleImputer(strategy="median")),
-                ("scaler", StandardScaler()),
-                ("model", Ridge(alpha=1.0)),
-            ]
+            preprocess_steps + [("model", Ridge(alpha=1.0))]
         ),
         "Random Forest": Pipeline(
-            [
-                ("imputer", SimpleImputer(strategy="median")),
+            preprocess_steps
+            + [
                 (
                     "model",
                     RandomForestRegressor(
@@ -185,12 +300,12 @@ def build_models() -> dict[str, object]:
                         random_state=RANDOM_STATE,
                         n_jobs=-1,
                     ),
-                ),
+                )
             ]
         ),
         "Extra Trees": Pipeline(
-            [
-                ("imputer", SimpleImputer(strategy="median")),
+            preprocess_steps
+            + [
                 (
                     "model",
                     ExtraTreesRegressor(
@@ -200,20 +315,15 @@ def build_models() -> dict[str, object]:
                         random_state=RANDOM_STATE,
                         n_jobs=-1,
                     ),
-                ),
+                )
             ]
         ),
         "SVR RBF": Pipeline(
-            [
-                ("imputer", SimpleImputer(strategy="median")),
-                ("scaler", StandardScaler()),
-                ("model", SVR(C=20.0, gamma="scale", epsilon=0.01)),
-            ]
+            preprocess_steps + [("model", SVR(C=20.0, gamma="scale", epsilon=0.01))]
         ),
         "ANN Deep MLP": Pipeline(
-            [
-                ("imputer", SimpleImputer(strategy="median")),
-                ("scaler", StandardScaler()),
+            preprocess_steps
+            + [
                 (
                     "model",
                     MLPRegressor(
@@ -228,15 +338,15 @@ def build_models() -> dict[str, object]:
                         max_iter=400,
                         random_state=RANDOM_STATE,
                     ),
-                ),
+                )
             ]
         ),
     }
 
     if XGBOOST_AVAILABLE and XGBRegressor is not None:
         models["XGBoost"] = Pipeline(
-            [
-                ("imputer", SimpleImputer(strategy="median")),
+            preprocess_steps
+            + [
                 (
                     "model",
                     XGBRegressor(
@@ -319,7 +429,13 @@ def run_depth_cv(
     y_tv_model = transform_target(target, y_tv_raw)
 
     for fold, (tr, va) in enumerate(splitter.split(x_tv), start=1):
-        pred = fit_predict(model, x_tv.iloc[tr], y_tv_model[tr], x_tv.iloc[va])
+        fold_features, _ = select_features(x_tv.iloc[tr], y_tv_raw[tr])
+        pred = fit_predict(
+            model,
+            x_tv.iloc[tr][fold_features],
+            y_tv_model[tr],
+            x_tv.iloc[va][fold_features],
+        )
         row = metrics(target, y_tv_raw[va], pred)
         row.update(
             {
@@ -438,12 +554,80 @@ def markdown_table(df: pd.DataFrame, columns: list[str]) -> str:
     return "\n".join([header, sep] + rows)
 
 
+def previous_thesis_preprocessing_comparison() -> pd.DataFrame:
+    rows = [
+        {
+            "Previous thesis preprocessing step": "Data import and descriptive statistics",
+            "Our implementation": "Imported final Excel sheet, numeric conversion, dataset_summary.csv",
+            "Status": "Done",
+        },
+        {
+            "Previous thesis preprocessing step": "Missing-value check and mean imputation",
+            "Our implementation": "Missing values counted in preprocessing_audit.csv; mean imputation used inside all model pipelines",
+            "Status": "Done",
+        },
+        {
+            "Previous thesis preprocessing step": "Input-feature outlier treatment using IQR",
+            "Our implementation": "IQRClipper applied inside each model pipeline using training data only",
+            "Status": "Done",
+        },
+        {
+            "Previous thesis preprocessing step": "Target invalid-value removal",
+            "Our implementation": "Target physical-range issues are flagged in preprocessing_audit.csv but targets are not altered to avoid artificial score inflation",
+            "Status": "Flagged, not manipulated",
+        },
+        {
+            "Previous thesis preprocessing step": "Duplicate full-row removal",
+            "Our implementation": "Full duplicate rows removed before modeling",
+            "Status": "Done",
+        },
+        {
+            "Previous thesis preprocessing step": "Noisy-data detection using IsolationForest",
+            "Our implementation": "IsolationForest applied to input features only; 2.5% anomalous input rows removed",
+            "Status": "Done",
+        },
+        {
+            "Previous thesis preprocessing step": "Binning/noise impact reduction",
+            "Our implementation": "IQR clipping plus Min-Max normalization reduces feature noise while preserving continuous log values for regression",
+            "Status": "Adapted",
+        },
+        {
+            "Previous thesis preprocessing step": "Min-Max normalization",
+            "Our implementation": "MinMaxScaler applied inside every model pipeline",
+            "Status": "Done",
+        },
+        {
+            "Previous thesis preprocessing step": "Correlation heatmap feature selection |r| >= 0.20",
+            "Our implementation": "Target-specific correlation feature selection applied inside train/validation folds",
+            "Status": "Done",
+        },
+        {
+            "Previous thesis preprocessing step": "Remove/check highly correlated features |r| >= 0.85",
+            "Our implementation": "Redundant high-correlation features reduced during feature selection",
+            "Status": "Done",
+        },
+        {
+            "Previous thesis preprocessing step": "70/15/15 train-validation-test split",
+            "Our implementation": "70/15/15 split retained, sorted by depth for stricter unseen-depth testing",
+            "Status": "Done, stricter",
+        },
+        {
+            "Previous thesis preprocessing step": "Linear Regression, SVR, RF, XGBoost, ANN",
+            "Our implementation": "Linear Regression, SVR, Random Forest, XGBoost, ANN plus Ridge, Extra Trees, Baseline",
+            "Status": "Done and expanded",
+        },
+    ]
+    return pd.DataFrame(rows)
+
+
 def write_report(
     df: pd.DataFrame,
     x: pd.DataFrame,
     scores: pd.DataFrame,
     cv_summary: pd.DataFrame,
     best_rows: pd.DataFrame,
+    preprocessing_audit: pd.DataFrame,
+    previous_comparison: pd.DataFrame,
     unavailable: list[str],
 ) -> None:
     source_rel = SOURCE_WORKBOOK.relative_to(PROJECT_ROOT)
@@ -468,7 +652,16 @@ def write_report(
     ].sort_values(["Target", "ValidationType", "R2"], ascending=[True, True, False])
 
     best_table = best_rows[
-        ["Target", "BestModel", "Test_R2", "Test_RMSE", "Test_MAE", "Test_MAPE_percent", "Test_Pearson_r"]
+        [
+            "Target",
+            "BestModel",
+            "Test_R2",
+            "Test_RMSE",
+            "Test_MAE",
+            "Test_MAPE_percent",
+            "Test_Pearson_r",
+            "SelectedFeatureCount",
+        ]
     ].copy()
 
     cv_table = cv_summary[
@@ -488,6 +681,7 @@ def write_report(
     dataset_table[["Mean", "Std", "Min", "Max"]] = dataset_table[
         ["Mean", "Std", "Min", "Max"]
     ].round(6)
+    audit_table = preprocessing_audit.copy()
 
     notes = ""
     if unavailable:
@@ -525,15 +719,27 @@ Important thesis note: the target values in this workbook are mostly petrophysic
 ## 3. Preprocessing
 
 - Converted all selected columns to numeric values.
+- Removed duplicate full rows.
 - Removed rows missing depth or any target value.
 - Sorted rows by depth.
-- Used median imputation for missing feature values inside each model pipeline.
-- Used standardized scaling for Ridge Regression, SVR, and ANN.
+- Used mean imputation for missing feature values, matching the previous thesis preprocessing.
+- Applied IQR-based clipping to input-feature outliers inside the model pipeline. Target variables were not clipped or edited for score improvement.
+- Applied IsolationForest on input features only to remove anomalous/noisy input rows before model training.
+- Applied Min-Max normalization inside each model pipeline, matching the previous thesis.
+- Applied target-specific correlation feature selection using the previous thesis rule: retain features with `|r| >= 0.20`, then reduce very high inter-feature correlation using `|r| >= 0.85`.
 - Used physical post-processing on predictions:
   - Porosity clipped to 0-1.
   - Water saturation clipped to 0-1.
   - Permeability clipped to non-negative values.
 - Modeled permeability using `log1p(k)` during training, then transformed predictions back to original k units for all reported metrics. This reduces the effect of high-permeability outliers.
+
+Previous-thesis preprocessing audit:
+
+{markdown_table(audit_table, ["Step", "Value"])}
+
+Previous-thesis preprocessing comparison:
+
+{markdown_table(previous_comparison, ["Previous thesis preprocessing step", "Our implementation", "Status"])}
 
 ## 4. Feature Engineering
 
@@ -558,6 +764,7 @@ Additional validation was performed with 5-fold `TimeSeriesSplit` on the trainin
 ## 6. Algorithms Tested
 
 - Baseline Mean
+- Linear Regression
 - Ridge Regression
 - Random Forest
 - Extra Trees
@@ -571,7 +778,7 @@ Additional validation was performed with 5-fold `TimeSeriesSplit` on the trainin
 
 ## 8. Best Test Model by Target
 
-{markdown_table(best_table, ["Target", "BestModel", "Test_R2", "Test_RMSE", "Test_MAE", "Test_MAPE_percent", "Test_Pearson_r"])}
+{markdown_table(best_table, ["Target", "BestModel", "Test_R2", "Test_RMSE", "Test_MAE", "Test_MAPE_percent", "Test_Pearson_r", "SelectedFeatureCount"])}
 
 ## 9. Depth Holdout Validation and Test Scores
 
@@ -598,7 +805,7 @@ Generated figures:
 - `12_all_models_predicted_vs_actual_porosity.png`: predicted-versus-actual comparison for all porosity models.
 - `12_all_models_predicted_vs_actual_permeability_k.png`: predicted-versus-actual comparison for all permeability models.
 - `12_all_models_predicted_vs_actual_water_saturation_sw.png`: predicted-versus-actual comparison for all water-saturation models.
-- `all_models_predicted_vs_actual/`: 21 individual predicted-versus-actual graphs, one for every target-model combination.
+- `all_models_predicted_vs_actual/`: individual predicted-versus-actual graphs for every target-model combination.
 - `09_porosity_permeability_sw_crossplot.png`: reservoir-quality crossplot of porosity versus permeability colored by Sw.
 - `10_neutron_density_porosity_crossplot.png`: NPHI-RHOB crossplot colored by porosity.
 - `11_best_model_feature_importance_panel.png`: most influential input features for the best models.
@@ -610,6 +817,9 @@ Generated figures:
 - `ml_outputs/cv_summary.csv`: mean and standard deviation CV metrics.
 - `ml_outputs/test_predictions.csv`: actual and predicted test rows for every model and target.
 - `ml_outputs/preprocessed_modeling_dataset.csv`: cleaned and engineered feature table with targets.
+- `ml_outputs/preprocessing_audit.csv`: previous-thesis preprocessing checks and row counts.
+- `ml_outputs/previous_thesis_preprocessing_comparison.csv`: direct checklist comparing the previous thesis preprocessing to this workflow.
+- `ml_outputs/feature_selection_summary.csv`: correlation-based feature-selection audit for each target.
 - `ml_outputs/best_models_summary.json`: best model selection by target.
 - `ml_outputs/ml_results_workbook.xlsx`: Excel workbook containing best models, holdout scores, CV scores, dataset summary, and test predictions.
 - `ml_outputs/models/`: saved best model files.
@@ -639,18 +849,28 @@ def main() -> None:
     splits = split_by_depth(df)
     models = build_models()
 
-    imputed = SimpleImputer(strategy="median").fit_transform(x)
+    imputed = SimpleImputer(strategy="mean").fit_transform(x)
     preprocessed = pd.DataFrame(imputed, columns=feature_names)
     preprocessed = pd.concat([df[["DEPT"]].reset_index(drop=True), preprocessed, y_all], axis=1)
     preprocessed.to_csv(OUTPUT_DIR / "preprocessed_modeling_dataset.csv", index=False)
 
     dataset_summary = df[BASE_FEATURES + TARGETS].describe().T.reset_index().rename(columns={"index": "Column"})
     dataset_summary.to_csv(OUTPUT_DIR / "dataset_summary.csv", index=False)
+    preprocessing_audit = pd.DataFrame(
+        [{"Step": key, "Value": value} for key, value in PREPROCESSING_AUDIT.items()]
+    )
+    preprocessing_audit.to_csv(OUTPUT_DIR / "preprocessing_audit.csv", index=False)
+    previous_comparison = previous_thesis_preprocessing_comparison()
+    previous_comparison.to_csv(
+        OUTPUT_DIR / "previous_thesis_preprocessing_comparison.csv",
+        index=False,
+    )
 
     score_rows: list[dict[str, float | int | str]] = []
     cv_rows: list[dict[str, float | int | str]] = []
     pred_rows: list[dict[str, float | str]] = []
-    fitted_models: dict[tuple[str, str], object] = {}
+    feature_selection_rows: list[pd.DataFrame] = []
+    fitted_models: dict[tuple[str, str], tuple[object, list[str]]] = {}
     unavailable: list[str] = []
     if not XGBOOST_AVAILABLE:
         unavailable.append(f"XGBoost could not be loaded: {XGBOOST_ERROR}")
@@ -662,18 +882,29 @@ def main() -> None:
 
         x_train = x.iloc[splits["train"]]
         y_train = y_model[splits["train"]]
+        y_train_raw = y_raw[splits["train"]]
         x_val = x.iloc[splits["validation"]]
         y_val_raw = y_raw[splits["validation"]]
         x_train_val = x.iloc[splits["train_validation"]]
         y_train_val = y_model[splits["train_validation"]]
+        y_train_val_raw = y_raw[splits["train_validation"]]
         x_test = x.iloc[splits["test"]]
         y_test_raw = y_raw[splits["test"]]
+
+        validation_features, validation_corr = select_features(x_train, y_train_raw)
+        validation_corr["Target"] = target
+        validation_corr["SelectionStage"] = "validation_train_only"
+        feature_selection_rows.append(validation_corr)
+        test_features, test_corr = select_features(x_train_val, y_train_val_raw)
+        test_corr["Target"] = target
+        test_corr["SelectionStage"] = "test_train_validation"
+        feature_selection_rows.append(test_corr)
 
         for model_name, model in models.items():
             print(f"  Model: {model_name}", flush=True)
             validation_model = clone(model)
-            validation_model.fit(x_train, y_train)
-            val_pred = validation_model.predict(x_val)
+            validation_model.fit(x_train[validation_features], y_train)
+            val_pred = validation_model.predict(x_val[validation_features])
             val_metrics = metrics(target, y_val_raw, val_pred)
             val_metrics.update(
                 {
@@ -686,8 +917,8 @@ def main() -> None:
             score_rows.append(val_metrics)
 
             final_model = clone(model)
-            final_model.fit(x_train_val, y_train_val)
-            test_pred_model_space = final_model.predict(x_test)
+            final_model.fit(x_train_val[test_features], y_train_val)
+            test_pred_model_space = final_model.predict(x_test[test_features])
             test_pred = inverse_target(target, test_pred_model_space)
             test_metrics = metrics(target, y_test_raw, test_pred_model_space)
             test_metrics.update(
@@ -699,7 +930,7 @@ def main() -> None:
                 }
             )
             score_rows.append(test_metrics)
-            fitted_models[(target, model_name)] = final_model
+            fitted_models[(target, model_name)] = (final_model, test_features)
 
             for depth, actual, predicted in zip(df["DEPT"].iloc[splits["test"]], y_test_raw, test_pred):
                 pred_rows.append(
@@ -718,10 +949,12 @@ def main() -> None:
     scores = pd.DataFrame(score_rows)
     cv_scores = pd.DataFrame(cv_rows)
     predictions = pd.DataFrame(pred_rows)
+    feature_selection = pd.concat(feature_selection_rows, ignore_index=True)
 
     scores.to_csv(OUTPUT_DIR / "model_scores.csv", index=False)
     cv_scores.to_csv(OUTPUT_DIR / "cv_fold_scores.csv", index=False)
     predictions.to_csv(OUTPUT_DIR / "test_predictions.csv", index=False)
+    feature_selection.to_csv(OUTPUT_DIR / "feature_selection_summary.csv", index=False)
 
     cv_summary = (
         cv_scores.groupby(["Target", "Model"], as_index=False)
@@ -749,10 +982,10 @@ def main() -> None:
         ].copy()
         best = target_scores.sort_values(["R2", "RMSE"], ascending=[False, True]).iloc[0]
         best_model_name = str(best["Model"])
-        best_model = fitted_models[(target, best_model_name)]
+        best_model, best_features = fitted_models[(target, best_model_name)]
         model_path = MODEL_DIR / f"best_{slugify(target)}_{slugify(best_model_name)}.joblib"
         joblib.dump(best_model, model_path)
-        save_feature_importance(target, best_model_name, best_model, feature_names)
+        save_feature_importance(target, best_model_name, best_model, best_features)
         plot_predictions(target, best_model_name, predictions)
         best_rows.append(
             {
@@ -763,6 +996,7 @@ def main() -> None:
                 "Test_MAE": float(best["MAE"]),
                 "Test_MAPE_percent": float(best["MAPE_percent"]),
                 "Test_Pearson_r": float(best["Pearson_r"]),
+                "SelectedFeatureCount": int(len(best_features)),
                 "SavedModel": str(model_path.relative_to(PROJECT_ROOT)),
             }
         )
@@ -779,9 +1013,21 @@ def main() -> None:
         cv_summary.to_excel(writer, sheet_name="CV Summary", index=False)
         cv_scores.to_excel(writer, sheet_name="CV Fold Scores", index=False)
         dataset_summary.to_excel(writer, sheet_name="Dataset Summary", index=False)
+        preprocessing_audit.to_excel(writer, sheet_name="Preprocessing Audit", index=False)
+        previous_comparison.to_excel(writer, sheet_name="Previous Thesis Check", index=False)
+        feature_selection.to_excel(writer, sheet_name="Feature Selection", index=False)
         predictions.to_excel(writer, sheet_name="Test Predictions", index=False)
 
-    write_report(df, x, scores, cv_summary, best_df, unavailable)
+    write_report(
+        df,
+        x,
+        scores,
+        cv_summary,
+        best_df,
+        preprocessing_audit,
+        previous_comparison,
+        unavailable,
+    )
     print(f"Completed ML pipeline. Report: {REPORT_PATH}")
     print(best_df.to_string(index=False))
 

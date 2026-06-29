@@ -1,6 +1,6 @@
 # AI/ML Modeling Report for Petrophysical Properties
 
-Updated: 2026-06-29 01:36
+Updated: 2026-06-29 22:38
 
 ## 1. Objective
 
@@ -17,8 +17,8 @@ The work uses the final corrected workbook produced from the LAS conversion and 
 ## 2. Dataset Used
 
 - Sheet: `Calculated Data`
-- Total usable rows after numeric cleaning: 7,440
-- Depth interval: 7800.0 to 11519.5
+- Total usable rows after numeric cleaning: 7,254
+- Depth interval: 7800.0 to 11513.0
 - Input features before engineering: 12
 - Input features after engineering: 37
 - Targets: Porosity, Permeability k, Water Saturation Sw
@@ -28,15 +28,54 @@ Important thesis note: the target values in this workbook are mostly petrophysic
 ## 3. Preprocessing
 
 - Converted all selected columns to numeric values.
+- Removed duplicate full rows.
 - Removed rows missing depth or any target value.
 - Sorted rows by depth.
-- Used median imputation for missing feature values inside each model pipeline.
-- Used standardized scaling for Ridge Regression, SVR, and ANN.
+- Used mean imputation for missing feature values, matching the previous thesis preprocessing.
+- Applied IQR-based clipping to input-feature outliers inside the model pipeline. Target variables were not clipped or edited for score improvement.
+- Applied IsolationForest on input features only to remove anomalous/noisy input rows before model training.
+- Applied Min-Max normalization inside each model pipeline, matching the previous thesis.
+- Applied target-specific correlation feature selection using the previous thesis rule: retain features with `|r| >= 0.20`, then reduce very high inter-feature correlation using `|r| >= 0.85`.
 - Used physical post-processing on predictions:
   - Porosity clipped to 0-1.
   - Water saturation clipped to 0-1.
   - Permeability clipped to non-negative values.
 - Modeled permeability using `log1p(k)` during training, then transformed predictions back to original k units for all reported metrics. This reduces the effect of high-permeability outliers.
+
+Previous-thesis preprocessing audit:
+
+| Step | Value |
+| --- | --- |
+| raw_rows | 7441.0000 |
+| initial_missing_values | 13.0000 |
+| duplicate_full_rows_removed | 0.0000 |
+| rows_removed_missing_depth_or_target | 1.0000 |
+| porosity_gt_0_35 | 20.0000 |
+| porosity_lt_0 | 0.0000 |
+| permeability_gt_800 | 339.0000 |
+| permeability_lte_0 | 0.0000 |
+| water_saturation_gt_1 | 47.0000 |
+| water_saturation_lt_0 | 0.0000 |
+| isolation_forest_contamination | 0.0250 |
+| isolation_forest_rows_removed | 186.0000 |
+| final_rows_after_previous_thesis_preprocessing | 7254.0000 |
+
+Previous-thesis preprocessing comparison:
+
+| Previous thesis preprocessing step | Our implementation | Status |
+| --- | --- | --- |
+| Data import and descriptive statistics | Imported final Excel sheet, numeric conversion, dataset_summary.csv | Done |
+| Missing-value check and mean imputation | Missing values counted in preprocessing_audit.csv; mean imputation used inside all model pipelines | Done |
+| Input-feature outlier treatment using IQR | IQRClipper applied inside each model pipeline using training data only | Done |
+| Target invalid-value removal | Target physical-range issues are flagged in preprocessing_audit.csv but targets are not altered to avoid artificial score inflation | Flagged, not manipulated |
+| Duplicate full-row removal | Full duplicate rows removed before modeling | Done |
+| Noisy-data detection using IsolationForest | IsolationForest applied to input features only; 2.5% anomalous input rows removed | Done |
+| Binning/noise impact reduction | IQR clipping plus Min-Max normalization reduces feature noise while preserving continuous log values for regression | Adapted |
+| Min-Max normalization | MinMaxScaler applied inside every model pipeline | Done |
+| Correlation heatmap feature selection \|r\| >= 0.20 | Target-specific correlation feature selection applied inside train/validation folds | Done |
+| Remove/check highly correlated features \|r\| >= 0.85 | Redundant high-correlation features reduced during feature selection | Done |
+| 70/15/15 train-validation-test split | 70/15/15 split retained, sorted by depth for stricter unseen-depth testing | Done, stricter |
+| Linear Regression, SVR, RF, XGBoost, ANN | Linear Regression, SVR, Random Forest, XGBoost, ANN plus Ridge, Extra Trees, Baseline | Done and expanded |
 
 ## 4. Feature Engineering
 
@@ -61,6 +100,7 @@ Additional validation was performed with 5-fold `TimeSeriesSplit` on the trainin
 ## 6. Algorithms Tested
 
 - Baseline Mean
+- Linear Regression
 - Ridge Regression
 - Random Forest
 - Extra Trees
@@ -72,102 +112,111 @@ Additional validation was performed with 5-fold `TimeSeriesSplit` on the trainin
 
 | Column | Missing | Mean | Std | Min | Max |
 | --- | --- | --- | --- | --- | --- |
-| DEPT | 0 | 9659.7500 | 1073.9437 | 7800.0000 | 11519.5000 |
-| GR | 0 | 47.3764 | 13.4661 | 22.2000 | 144.7000 |
-| CALI | 0 | 9.3350 | 1.5091 | 8.2867 | 19.3800 |
-| SP | 0 | -84.3643 | 21.9982 | -125.2222 | -34.8444 |
-| ILD | 0 | 23.8093 | 33.9320 | 4.0897 | 741.9307 |
-| SFLU | 0 | 25.9480 | 36.5363 | 4.5119 | 1779.7676 |
-| MSFL | 0 | 30.3661 | 18.1194 | 5.6802 | 408.9749 |
-| DT | 0 | 83.0928 | 8.4747 | 51.6667 | 125.1333 |
-| RHOB | 0 | 2.3974 | 0.0948 | 1.6053 | 2.6996 |
-| DRHO | 0 | 0.0065 | 0.0239 | -0.0258 | 0.2438 |
-| PEF | 0 | 3.0708 | 0.4186 | 2.2800 | 6.8667 |
-| NPHI | 0 | 23.1334 | 3.7743 | 4.6800 | 52.8933 |
-| Porosity | 0 | 0.2133 | 0.0342 | 0.0498 | 0.4737 |
-| Permeability k | 0 | 294.9530 | 1021.5302 | 0.0151 | 31684.0448 |
-| Water Saturation Sw | 0 | 0.4880 | 0.1943 | 0.0841 | 2.0208 |
+| DEPT | 0 | 9666.2892 | 1064.2045 | 7800.0000 | 11513.0000 |
+| GR | 0 | 47.5028 | 13.3587 | 22.2000 | 127.3000 |
+| CALI | 0 | 9.3429 | 1.5198 | 8.2867 | 19.3800 |
+| SP | 0 | -84.0719 | 21.9962 | -125.2222 | -34.8444 |
+| ILD | 0 | 21.5217 | 24.8839 | 4.0897 | 232.8990 |
+| SFLU | 0 | 23.4885 | 16.1548 | 4.8272 | 119.0410 |
+| MSFL | 0 | 29.4190 | 14.8233 | 5.7504 | 197.5589 |
+| DT | 0 | 83.0857 | 8.0631 | 56.0667 | 125.1333 |
+| RHOB | 0 | 2.3981 | 0.0909 | 2.1713 | 2.6493 |
+| DRHO | 0 | 0.0060 | 0.0224 | -0.0247 | 0.1743 |
+| PEF | 0 | 3.0590 | 0.3795 | 2.2800 | 5.5200 |
+| NPHI | 0 | 23.2275 | 3.4434 | 8.8133 | 52.8933 |
+| Porosity | 0 | 0.2135 | 0.0314 | 0.0957 | 0.4222 |
+| Permeability k | 0 | 246.4321 | 728.6450 | 0.5403 | 31684.0448 |
+| Water Saturation Sw | 0 | 0.4902 | 0.1856 | 0.1001 | 1.3599 |
 
 ## 8. Best Test Model by Target
 
-| Target | BestModel | Test_R2 | Test_RMSE | Test_MAE | Test_MAPE_percent | Test_Pearson_r |
-| --- | --- | --- | --- | --- | --- | --- |
-| Porosity | Ridge Regression | 0.9567 | 0.0055 | 0.0022 | 1.0731 | 0.9853 |
-| Permeability k | Ridge Regression | 0.3904 | 312.1091 | 17.4767 | 5.4775 | 0.9493 |
-| Water Saturation Sw | Ridge Regression | 0.9228 | 0.0397 | 0.0220 | 3.3397 | 0.9732 |
+| Target | BestModel | Test_R2 | Test_RMSE | Test_MAE | Test_MAPE_percent | Test_Pearson_r | SelectedFeatureCount |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Porosity | Random Forest | 0.9915 | 0.0016 | 0.0008 | 0.4230 | 0.9961 | 14 |
+| Permeability k | ANN Deep MLP | 0.7652 | 12.0077 | 6.0266 | 14.4277 | 0.8905 | 13 |
+| Water Saturation Sw | Random Forest | 0.8112 | 0.0596 | 0.0446 | 7.2377 | 0.9113 | 15 |
 
 ## 9. Depth Holdout Validation and Test Scores
 
 | Target | Model | ValidationType | Rows | R2 | RMSE | MAE | MAPE_percent | Pearson_r |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Permeability k | Ridge Regression | Depth Holdout Test | 1116 | 0.3904 | 312.1091 | 17.4767 | 5.4775 | 0.9493 |
-| Permeability k | XGBoost | Depth Holdout Test | 1116 | 0.0335 | 392.9981 | 34.9081 | 17.3857 | 0.3205 |
-| Permeability k | SVR RBF | Depth Holdout Test | 1116 | 0.0206 | 395.6157 | 34.0109 | 22.8515 | 0.2574 |
-| Permeability k | Extra Trees | Depth Holdout Test | 1116 | 0.0167 | 396.3873 | 33.3818 | 12.5450 | 0.2378 |
-| Permeability k | Random Forest | Depth Holdout Test | 1116 | 0.0146 | 396.8082 | 34.8561 | 17.2339 | 0.2083 |
-| Permeability k | Baseline Mean | Depth Holdout Test | 1116 | -0.0140 | 402.5401 | 107.2764 | 405.3830 |  |
-| Permeability k | ANN Deep MLP | Depth Holdout Test | 1116 | -198.3828 | 5644.5122 | 374.5925 | 32.1364 | 0.9820 |
-| Permeability k | Ridge Regression | Depth Holdout Validation | 1116 | 0.9943 | 11.9189 | 4.4078 | 8.0018 | 0.9975 |
-| Permeability k | XGBoost | Depth Holdout Validation | 1116 | 0.9229 | 43.7297 | 13.4206 | 22.1306 | 0.9685 |
-| Permeability k | Extra Trees | Depth Holdout Validation | 1116 | 0.8958 | 50.8539 | 12.8483 | 25.0951 | 0.9581 |
-| Permeability k | Random Forest | Depth Holdout Validation | 1116 | 0.8515 | 60.7105 | 17.0285 | 34.0227 | 0.9412 |
-| Permeability k | SVR RBF | Depth Holdout Validation | 1116 | 0.8088 | 68.8786 | 11.9767 | 284.2956 | 0.9108 |
-| Permeability k | Baseline Mean | Depth Holdout Validation | 1116 | -0.1766 | 170.8646 | 137.1706 | 2190.3854 |  |
-| Permeability k | ANN Deep MLP | Depth Holdout Validation | 1116 | -12558.0042 | 17652.9754 | 567.5752 | 305947.7643 | -0.0054 |
-| Porosity | Ridge Regression | Depth Holdout Test | 1116 | 0.9567 | 0.0055 | 0.0022 | 1.0731 | 0.9853 |
-| Porosity | XGBoost | Depth Holdout Test | 1116 | 0.7491 | 0.0133 | 0.0029 | 1.2151 | 0.8831 |
-| Porosity | ANN Deep MLP | Depth Holdout Test | 1116 | 0.7291 | 0.0138 | 0.0076 | 4.0648 | 0.8585 |
-| Porosity | Extra Trees | Depth Holdout Test | 1116 | 0.6764 | 0.0151 | 0.0023 | 0.8210 | 0.8372 |
-| Porosity | Random Forest | Depth Holdout Test | 1116 | 0.6560 | 0.0156 | 0.0023 | 0.8103 | 0.8231 |
-| Porosity | SVR RBF | Depth Holdout Test | 1116 | 0.2743 | 0.0227 | 0.0121 | 6.1456 | 0.5373 |
-| Porosity | Baseline Mean | Depth Holdout Test | 1116 | -0.9650 | 0.0373 | 0.0299 | 16.5509 |  |
-| Porosity | Extra Trees | Depth Holdout Validation | 1116 | 0.9821 | 0.0027 | 0.0015 | 0.9395 | 0.9919 |
-| Porosity | XGBoost | Depth Holdout Validation | 1116 | 0.9742 | 0.0033 | 0.0022 | 1.3829 | 0.9886 |
-| Porosity | Random Forest | Depth Holdout Validation | 1116 | 0.9740 | 0.0033 | 0.0018 | 1.1159 | 0.9883 |
-| Porosity | Ridge Regression | Depth Holdout Validation | 1116 | 0.9390 | 0.0051 | 0.0034 | 1.9393 | 0.9803 |
-| Porosity | ANN Deep MLP | Depth Holdout Validation | 1116 | 0.5757 | 0.0134 | 0.0094 | 5.3159 | 0.8403 |
-| Porosity | SVR RBF | Depth Holdout Validation | 1116 | 0.4937 | 0.0146 | 0.0101 | 6.1904 | 0.8022 |
-| Porosity | Baseline Mean | Depth Holdout Validation | 1116 | -2.9988 | 0.0410 | 0.0357 | 21.1493 | -0.0000 |
-| Water Saturation Sw | Ridge Regression | Depth Holdout Test | 1116 | 0.9228 | 0.0397 | 0.0220 | 3.3397 | 0.9732 |
-| Water Saturation Sw | ANN Deep MLP | Depth Holdout Test | 1116 | 0.9170 | 0.0412 | 0.0217 | 3.5847 | 0.9605 |
-| Water Saturation Sw | Extra Trees | Depth Holdout Test | 1116 | 0.9041 | 0.0443 | 0.0224 | 3.8005 | 0.9608 |
-| Water Saturation Sw | XGBoost | Depth Holdout Test | 1116 | 0.8823 | 0.0491 | 0.0321 | 5.4655 | 0.9489 |
-| Water Saturation Sw | Random Forest | Depth Holdout Test | 1116 | 0.8689 | 0.0518 | 0.0296 | 5.0526 | 0.9369 |
-| Water Saturation Sw | SVR RBF | Depth Holdout Test | 1116 | 0.8049 | 0.0631 | 0.0303 | 4.4475 | 0.9277 |
-| Water Saturation Sw | Baseline Mean | Depth Holdout Test | 1116 | -1.0128 | 0.2028 | 0.1502 | 21.8156 | 0.0000 |
-| Water Saturation Sw | Extra Trees | Depth Holdout Validation | 1116 | 0.9246 | 0.0544 | 0.0224 | 3.3267 | 0.9674 |
-| Water Saturation Sw | XGBoost | Depth Holdout Validation | 1116 | 0.9203 | 0.0560 | 0.0259 | 4.0395 | 0.9620 |
-| Water Saturation Sw | Ridge Regression | Depth Holdout Validation | 1116 | 0.9192 | 0.0563 | 0.0267 | 4.9117 | 0.9606 |
-| Water Saturation Sw | Random Forest | Depth Holdout Validation | 1116 | 0.9119 | 0.0588 | 0.0276 | 4.2729 | 0.9584 |
-| Water Saturation Sw | SVR RBF | Depth Holdout Validation | 1116 | 0.8472 | 0.0775 | 0.0350 | 5.7702 | 0.9352 |
-| Water Saturation Sw | ANN Deep MLP | Depth Holdout Validation | 1116 | 0.8380 | 0.0798 | 0.0499 | 8.7066 | 0.9351 |
-| Water Saturation Sw | Baseline Mean | Depth Holdout Validation | 1116 | -0.6494 | 0.2545 | 0.2172 | 39.7592 |  |
+| Permeability k | ANN Deep MLP | Depth Holdout Test | 1089 | 0.7652 | 12.0077 | 6.0266 | 14.4277 | 0.8905 |
+| Permeability k | Linear Regression | Depth Holdout Test | 1089 | 0.7542 | 12.2860 | 5.6044 | 14.9685 | 0.8688 |
+| Permeability k | Ridge Regression | Depth Holdout Test | 1089 | 0.7514 | 12.3560 | 5.4825 | 14.8041 | 0.8671 |
+| Permeability k | SVR RBF | Depth Holdout Test | 1089 | 0.7088 | 13.3734 | 5.3605 | 16.5160 | 0.8584 |
+| Permeability k | Extra Trees | Depth Holdout Test | 1089 | 0.7022 | 13.5242 | 5.0796 | 13.2663 | 0.8645 |
+| Permeability k | XGBoost | Depth Holdout Test | 1089 | 0.6682 | 14.2761 | 6.2561 | 15.3638 | 0.8561 |
+| Permeability k | Random Forest | Depth Holdout Test | 1089 | 0.6323 | 15.0283 | 6.3173 | 16.1763 | 0.8246 |
+| Permeability k | Baseline Mean | Depth Holdout Test | 1089 | -9.3218 | 79.6202 | 76.7763 | 378.1903 |  |
+| Permeability k | Linear Regression | Depth Holdout Validation | 1088 | 0.9709 | 22.5484 | 9.5648 | 18.8620 | 0.9854 |
+| Permeability k | ANN Deep MLP | Depth Holdout Validation | 1088 | 0.9697 | 22.9826 | 9.1822 | 15.3077 | 0.9871 |
+| Permeability k | Ridge Regression | Depth Holdout Validation | 1088 | 0.9690 | 23.2544 | 10.0738 | 18.7961 | 0.9847 |
+| Permeability k | Extra Trees | Depth Holdout Validation | 1088 | 0.9357 | 33.4934 | 11.4025 | 17.1095 | 0.9686 |
+| Permeability k | XGBoost | Depth Holdout Validation | 1088 | 0.9207 | 37.2112 | 13.9856 | 18.8683 | 0.9637 |
+| Permeability k | Random Forest | Depth Holdout Validation | 1088 | 0.9192 | 37.5650 | 14.4733 | 20.5069 | 0.9621 |
+| Permeability k | SVR RBF | Depth Holdout Validation | 1088 | 0.9106 | 39.5040 | 16.7310 | 27.1408 | 0.9609 |
+| Permeability k | Baseline Mean | Depth Holdout Validation | 1088 | -0.2671 | 148.7323 | 129.5192 | 447.0616 |  |
+| Porosity | Random Forest | Depth Holdout Test | 1089 | 0.9915 | 0.0016 | 0.0008 | 0.4230 | 0.9961 |
+| Porosity | Extra Trees | Depth Holdout Test | 1089 | 0.9879 | 0.0019 | 0.0008 | 0.4538 | 0.9952 |
+| Porosity | XGBoost | Depth Holdout Test | 1089 | 0.9669 | 0.0032 | 0.0023 | 1.2355 | 0.9913 |
+| Porosity | Linear Regression | Depth Holdout Test | 1089 | 0.9651 | 0.0033 | 0.0023 | 1.2509 | 0.9866 |
+| Porosity | Ridge Regression | Depth Holdout Test | 1089 | 0.9627 | 0.0034 | 0.0024 | 1.3089 | 0.9864 |
+| Porosity | ANN Deep MLP | Depth Holdout Test | 1089 | 0.8846 | 0.0059 | 0.0047 | 2.5793 | 0.9663 |
+| Porosity | SVR RBF | Depth Holdout Test | 1089 | 0.6886 | 0.0098 | 0.0072 | 3.9763 | 0.8406 |
+| Porosity | Baseline Mean | Depth Holdout Test | 1089 | -2.6269 | 0.0333 | 0.0287 | 16.2193 | 0.0000 |
+| Porosity | Extra Trees | Depth Holdout Validation | 1088 | 0.9762 | 0.0027 | 0.0012 | 0.7114 | 0.9893 |
+| Porosity | Random Forest | Depth Holdout Validation | 1088 | 0.9666 | 0.0031 | 0.0016 | 0.9140 | 0.9852 |
+| Porosity | XGBoost | Depth Holdout Validation | 1088 | 0.9550 | 0.0037 | 0.0026 | 1.4364 | 0.9799 |
+| Porosity | ANN Deep MLP | Depth Holdout Validation | 1088 | 0.9075 | 0.0052 | 0.0039 | 2.1485 | 0.9628 |
+| Porosity | Linear Regression | Depth Holdout Validation | 1088 | 0.8909 | 0.0057 | 0.0045 | 2.4438 | 0.9658 |
+| Porosity | Ridge Regression | Depth Holdout Validation | 1088 | 0.8902 | 0.0057 | 0.0045 | 2.4570 | 0.9665 |
+| Porosity | SVR RBF | Depth Holdout Validation | 1088 | 0.7945 | 0.0078 | 0.0057 | 3.1052 | 0.9096 |
+| Porosity | Baseline Mean | Depth Holdout Validation | 1088 | -4.0683 | 0.0388 | 0.0350 | 19.4943 | 0.0000 |
+| Water Saturation Sw | Random Forest | Depth Holdout Test | 1089 | 0.8112 | 0.0596 | 0.0446 | 7.2377 | 0.9113 |
+| Water Saturation Sw | ANN Deep MLP | Depth Holdout Test | 1089 | 0.7989 | 0.0615 | 0.0410 | 6.4300 | 0.8985 |
+| Water Saturation Sw | Extra Trees | Depth Holdout Test | 1089 | 0.7800 | 0.0644 | 0.0437 | 6.9073 | 0.9054 |
+| Water Saturation Sw | XGBoost | Depth Holdout Test | 1089 | 0.7769 | 0.0648 | 0.0483 | 7.8391 | 0.8950 |
+| Water Saturation Sw | Ridge Regression | Depth Holdout Test | 1089 | 0.7735 | 0.0653 | 0.0439 | 6.7882 | 0.9203 |
+| Water Saturation Sw | Linear Regression | Depth Holdout Test | 1089 | 0.7692 | 0.0659 | 0.0443 | 6.8313 | 0.9163 |
+| Water Saturation Sw | SVR RBF | Depth Holdout Test | 1089 | 0.4869 | 0.0983 | 0.0710 | 11.2695 | 0.7048 |
+| Water Saturation Sw | Baseline Mean | Depth Holdout Test | 1089 | -1.0717 | 0.1975 | 0.1451 | 20.8018 |  |
+| Water Saturation Sw | Linear Regression | Depth Holdout Validation | 1088 | 0.9059 | 0.0554 | 0.0425 | 7.3178 | 0.9526 |
+| Water Saturation Sw | Random Forest | Depth Holdout Validation | 1088 | 0.9039 | 0.0560 | 0.0377 | 5.8002 | 0.9623 |
+| Water Saturation Sw | Extra Trees | Depth Holdout Validation | 1088 | 0.9035 | 0.0561 | 0.0373 | 5.7850 | 0.9660 |
+| Water Saturation Sw | Ridge Regression | Depth Holdout Validation | 1088 | 0.8946 | 0.0586 | 0.0451 | 7.6707 | 0.9476 |
+| Water Saturation Sw | XGBoost | Depth Holdout Validation | 1088 | 0.8671 | 0.0658 | 0.0455 | 7.0486 | 0.9600 |
+| Water Saturation Sw | ANN Deep MLP | Depth Holdout Validation | 1088 | 0.8471 | 0.0706 | 0.0539 | 9.4334 | 0.9526 |
+| Water Saturation Sw | SVR RBF | Depth Holdout Validation | 1088 | 0.6966 | 0.0994 | 0.0773 | 13.4686 | 0.8369 |
+| Water Saturation Sw | Baseline Mean | Depth Holdout Validation | 1088 | -0.7170 | 0.2365 | 0.2090 | 38.3010 | -0.0000 |
 
 ## 10. Five-Fold Depth-Ordered Cross-Validation Summary
 
 | Target | Model | CV_R2_mean | CV_R2_std | CV_RMSE_mean | CV_RMSE_std | CV_MAE_mean | CV_MAPE_percent_mean |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| Permeability k | SVR RBF | 0.5996 | 0.2504 | 65.9816 | 64.5968 | 31.7591 | 169.7631 |
-| Permeability k | Extra Trees | 0.5372 | 0.4518 | 66.9277 | 69.2950 | 35.3216 | 35.5557 |
-| Permeability k | Ridge Regression | 0.5044 | 0.6339 | 78.3184 | 106.2871 | 30.2413 | 15.0146 |
-| Permeability k | XGBoost | 0.3913 | 0.5147 | 74.5826 | 61.7424 | 39.4452 | 35.5766 |
-| Permeability k | Random Forest | 0.1007 | 1.1273 | 82.6982 | 73.6344 | 43.5581 | 43.5369 |
-| Permeability k | Baseline Mean | -7.2343 | 13.0229 | 182.0667 | 55.9339 | 160.5820 | 903.9289 |
-| Permeability k | ANN Deep MLP | -1215.8757 | 2334.6652 | 4097.1602 | 7226.2163 | 565.7748 | 3130.1685 |
-| Porosity | Extra Trees | 0.9674 | 0.0182 | 0.0034 | 0.0004 | 0.0019 | 1.0404 |
-| Porosity | XGBoost | 0.9538 | 0.0280 | 0.0041 | 0.0007 | 0.0027 | 1.4155 |
-| Porosity | Random Forest | 0.9414 | 0.0427 | 0.0044 | 0.0008 | 0.0024 | 1.3140 |
-| Porosity | Ridge Regression | 0.7962 | 0.3070 | 0.0070 | 0.0040 | 0.0050 | 2.4038 |
-| Porosity | SVR RBF | 0.0443 | 0.3956 | 0.0193 | 0.0041 | 0.0146 | 7.6507 |
-| Porosity | Baseline Mean | -1.5624 | 1.1607 | 0.0331 | 0.0129 | 0.0266 | 14.7296 |
-| Porosity | ANN Deep MLP | -12.3893 | 15.3327 | 0.0607 | 0.0285 | 0.0431 | 20.6559 |
-| Water Saturation Sw | Ridge Regression | 0.7015 | 0.2848 | 0.0586 | 0.0410 | 0.0345 | 7.2032 |
-| Water Saturation Sw | XGBoost | 0.5333 | 0.5231 | 0.0619 | 0.0466 | 0.0399 | 7.1290 |
-| Water Saturation Sw | Random Forest | 0.4905 | 0.6228 | 0.0655 | 0.0517 | 0.0416 | 6.8254 |
-| Water Saturation Sw | Extra Trees | 0.4787 | 0.6163 | 0.0712 | 0.0556 | 0.0467 | 10.0170 |
-| Water Saturation Sw | SVR RBF | -0.1784 | 0.9336 | 0.0936 | 0.0545 | 0.0649 | 14.5908 |
-| Water Saturation Sw | ANN Deep MLP | -0.3748 | 1.5454 | 0.0896 | 0.0403 | 0.0526 | 14.3496 |
-| Water Saturation Sw | Baseline Mean | -2.0216 | 2.4166 | 0.1865 | 0.1198 | 0.1623 | 30.7489 |
+| Permeability k | Linear Regression | 0.8180 | 0.2427 | 33.7451 | 23.5832 | 21.0462 | 31.6146 |
+| Permeability k | Ridge Regression | 0.8110 | 0.2342 | 35.1042 | 22.8543 | 21.8146 | 31.6897 |
+| Permeability k | ANN Deep MLP | 0.7448 | 0.1726 | 53.2768 | 52.5483 | 28.7188 | 27.0697 |
+| Permeability k | XGBoost | 0.6165 | 0.2553 | 62.5925 | 55.4755 | 35.5256 | 32.1429 |
+| Permeability k | SVR RBF | 0.5468 | 0.6232 | 53.8546 | 53.0055 | 28.3735 | 44.2729 |
+| Permeability k | Extra Trees | 0.5345 | 0.4512 | 63.8264 | 63.3627 | 33.3085 | 32.2969 |
+| Permeability k | Random Forest | 0.4562 | 0.5382 | 67.7227 | 59.4207 | 36.1872 | 36.2020 |
+| Permeability k | Baseline Mean | -6.3313 | 11.8490 | 165.0109 | 54.6842 | 145.0693 | 370.9310 |
+| Porosity | Extra Trees | 0.9322 | 0.0533 | 0.0043 | 0.0017 | 0.0024 | 1.2272 |
+| Porosity | XGBoost | 0.9266 | 0.0302 | 0.0049 | 0.0017 | 0.0033 | 1.6636 |
+| Porosity | Random Forest | 0.9241 | 0.0453 | 0.0047 | 0.0015 | 0.0026 | 1.3174 |
+| Porosity | Ridge Regression | 0.8580 | 0.0725 | 0.0066 | 0.0016 | 0.0049 | 2.4424 |
+| Porosity | Linear Regression | 0.7930 | 0.2103 | 0.0072 | 0.0024 | 0.0056 | 2.7151 |
+| Porosity | SVR RBF | 0.3746 | 0.5001 | 0.0131 | 0.0038 | 0.0094 | 4.6551 |
+| Porosity | Baseline Mean | -1.8953 | 1.6960 | 0.0310 | 0.0120 | 0.0255 | 13.4965 |
+| Porosity | ANN Deep MLP | -2.9459 | 7.5052 | 0.0203 | 0.0213 | 0.0175 | 7.6569 |
+| Water Saturation Sw | XGBoost | 0.4171 | 0.5988 | 0.0670 | 0.0490 | 0.0520 | 10.7102 |
+| Water Saturation Sw | Random Forest | 0.4088 | 0.6465 | 0.0645 | 0.0486 | 0.0483 | 8.4263 |
+| Water Saturation Sw | Ridge Regression | 0.3127 | 0.7567 | 0.0632 | 0.0461 | 0.0482 | 9.1222 |
+| Water Saturation Sw | Extra Trees | 0.3045 | 0.8892 | 0.0740 | 0.0625 | 0.0568 | 12.0289 |
+| Water Saturation Sw | Linear Regression | 0.2816 | 0.8131 | 0.0625 | 0.0457 | 0.0477 | 9.0747 |
+| Water Saturation Sw | SVR RBF | -0.8122 | 2.1363 | 0.1063 | 0.0623 | 0.0842 | 18.7551 |
+| Water Saturation Sw | ANN Deep MLP | -1.0482 | 3.5375 | 0.0765 | 0.0462 | 0.0613 | 14.1624 |
+| Water Saturation Sw | Baseline Mean | -1.9347 | 2.6380 | 0.1757 | 0.1185 | 0.1548 | 28.8169 |
 
 ## 11. Thesis Graphs Generated
 
@@ -186,7 +235,7 @@ Generated figures:
 - `12_all_models_predicted_vs_actual_porosity.png`: predicted-versus-actual comparison for all porosity models.
 - `12_all_models_predicted_vs_actual_permeability_k.png`: predicted-versus-actual comparison for all permeability models.
 - `12_all_models_predicted_vs_actual_water_saturation_sw.png`: predicted-versus-actual comparison for all water-saturation models.
-- `all_models_predicted_vs_actual/`: 21 individual predicted-versus-actual graphs, one for every target-model combination.
+- `all_models_predicted_vs_actual/`: individual predicted-versus-actual graphs for every target-model combination.
 - `09_porosity_permeability_sw_crossplot.png`: reservoir-quality crossplot of porosity versus permeability colored by Sw.
 - `10_neutron_density_porosity_crossplot.png`: NPHI-RHOB crossplot colored by porosity.
 - `11_best_model_feature_importance_panel.png`: most influential input features for the best models.
@@ -198,6 +247,9 @@ Generated figures:
 - `ml_outputs/cv_summary.csv`: mean and standard deviation CV metrics.
 - `ml_outputs/test_predictions.csv`: actual and predicted test rows for every model and target.
 - `ml_outputs/preprocessed_modeling_dataset.csv`: cleaned and engineered feature table with targets.
+- `ml_outputs/preprocessing_audit.csv`: previous-thesis preprocessing checks and row counts.
+- `ml_outputs/previous_thesis_preprocessing_comparison.csv`: direct checklist comparing the previous thesis preprocessing to this workflow.
+- `ml_outputs/feature_selection_summary.csv`: correlation-based feature-selection audit for each target.
 - `ml_outputs/best_models_summary.json`: best model selection by target.
 - `ml_outputs/ml_results_workbook.xlsx`: Excel workbook containing best models, holdout scores, CV scores, dataset summary, and test predictions.
 - `ml_outputs/models/`: saved best model files.

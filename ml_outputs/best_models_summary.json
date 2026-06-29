@@ -1,32 +1,35 @@
 [
   {
     "Target": "Porosity",
-    "BestModel": "Ridge Regression",
-    "Test_R2": 0.9566996669378607,
-    "Test_RMSE": 0.0055354245158151915,
-    "Test_MAE": 0.002216823754539849,
-    "Test_MAPE_percent": 1.0731403823382413,
-    "Test_Pearson_r": 0.9853043615856806,
-    "SavedModel": "ml_outputs/models/best_porosity_ridge_regression.joblib"
+    "BestModel": "Random Forest",
+    "Test_R2": 0.9915424598888862,
+    "Test_RMSE": 0.0016071891904828133,
+    "Test_MAE": 0.0007559114510748335,
+    "Test_MAPE_percent": 0.42301693507053584,
+    "Test_Pearson_r": 0.9961145338673385,
+    "SelectedFeatureCount": 14,
+    "SavedModel": "ml_outputs/models/best_porosity_random_forest.joblib"
   },
   {
     "Target": "Permeability k",
-    "BestModel": "Ridge Regression",
-    "Test_R2": 0.3903958829085281,
-    "Test_RMSE": 312.10912815567775,
-    "Test_MAE": 17.476746553479813,
-    "Test_MAPE_percent": 5.477464755921804,
-    "Test_Pearson_r": 0.9492697092263557,
-    "SavedModel": "ml_outputs/models/best_permeability_k_ridge_regression.joblib"
+    "BestModel": "ANN Deep MLP",
+    "Test_R2": 0.7652364133588734,
+    "Test_RMSE": 12.007738563055065,
+    "Test_MAE": 6.026630513996074,
+    "Test_MAPE_percent": 14.427672126907284,
+    "Test_Pearson_r": 0.8905275630354554,
+    "SelectedFeatureCount": 13,
+    "SavedModel": "ml_outputs/models/best_permeability_k_ann_deep_mlp.joblib"
   },
   {
     "Target": "Water Saturation Sw",
-    "BestModel": "Ridge Regression",
-    "Test_R2": 0.9228323556085319,
-    "Test_RMSE": 0.03971373686336332,
-    "Test_MAE": 0.022000451090477748,
-    "Test_MAPE_percent": 3.3397076670279477,
-    "Test_Pearson_r": 0.9731571175427164,
-    "SavedModel": "ml_outputs/models/best_water_saturation_sw_ridge_regression.joblib"
+    "BestModel": "Random Forest",
+    "Test_R2": 0.8111978235969799,
+    "Test_RMSE": 0.05963451641981466,
+    "Test_MAE": 0.044556354507005014,
+    "Test_MAPE_percent": 7.237670866594341,
+    "Test_Pearson_r": 0.9113117425298521,
+    "SelectedFeatureCount": 15,
+    "SavedModel": "ml_outputs/models/best_water_saturation_sw_random_forest.joblib"
   }
 ]

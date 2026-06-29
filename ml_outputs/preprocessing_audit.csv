@@ -1,0 +1,14 @@
+Step,Value
+raw_rows,7441.0
+initial_missing_values,13.0
+duplicate_full_rows_removed,0.0
+rows_removed_missing_depth_or_target,1.0
+porosity_gt_0_35,20.0
+porosity_lt_0,0.0
+permeability_gt_800,339.0
+permeability_lte_0,0.0
+water_saturation_gt_1,47.0
+water_saturation_lt_0,0.0
+isolation_forest_contamination,0.025
+isolation_forest_rows_removed,186.0
+final_rows_after_previous_thesis_preprocessing,7254.0
