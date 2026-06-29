@@ -14,6 +14,7 @@ os.environ.setdefault(
 import matplotlib
 import numpy as np
 import pandas as pd
+from sklearn.ensemble import IsolationForest
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -21,6 +22,11 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+SOURCE_WORKBOOK = (
+    PROJECT_ROOT
+    / "outputs/final_renamed_porosity_20260629/KAILA3_final_porosity_perm_corrected.xlsx"
+)
+SHEET_NAME = "Calculated Data"
 DATA_PATH = PROJECT_ROOT / "ml_outputs/preprocessed_modeling_dataset.csv"
 SCORES_PATH = PROJECT_ROOT / "ml_outputs/model_scores.csv"
 CV_PATH = PROJECT_ROOT / "ml_outputs/cv_summary.csv"
@@ -31,7 +37,23 @@ ALL_MODEL_DIR = GRAPH_DIR / "all_models_predicted_vs_actual"
 PDF_PATH = GRAPH_DIR / "thesis_graph_pack.pdf"
 
 TARGETS = ["Porosity", "Permeability k", "Water Saturation Sw"]
+BASE_FEATURES = [
+    "DEPT",
+    "GR",
+    "CALI",
+    "SP",
+    "ILD",
+    "SFLU",
+    "MSFL",
+    "DT",
+    "RHOB",
+    "DRHO",
+    "PEF",
+    "NPHI",
+]
 LOG_INPUTS = ["GR", "ILD", "RHOB", "NPHI", "DT", "CALI"]
+RANDOM_STATE = 42
+NOISE_CONTAMINATION = 0.025
 
 
 def setup_style() -> None:
@@ -74,6 +96,151 @@ def load() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.DataFrame, pd.D
     predictions = pd.read_csv(PREDICTIONS_PATH)
     best = pd.read_csv(BEST_PATH)
     return data, scores, cv, predictions, best
+
+
+def load_raw_workbook() -> pd.DataFrame:
+    df = pd.read_excel(SOURCE_WORKBOOK, sheet_name=SHEET_NAME)
+    keep = BASE_FEATURES + TARGETS
+    df = df[keep].copy()
+    for col in keep:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
+    return df.replace([np.inf, -np.inf], np.nan)
+
+
+def minmax_frame(df: pd.DataFrame, cols: list[str]) -> pd.DataFrame:
+    scaled = df[cols].copy()
+    for col in cols:
+        values = scaled[col].astype(float)
+        mn = values.min()
+        mx = values.max()
+        if pd.isna(mn) or pd.isna(mx) or mx == mn:
+            scaled[col] = 0.0
+        else:
+            scaled[col] = (values - mn) / (mx - mn)
+    return scaled
+
+
+def iqr_clip_frame(df: pd.DataFrame, cols: list[str], factor: float = 1.5) -> pd.DataFrame:
+    clipped = df[cols].copy()
+    for col in cols:
+        q1 = clipped[col].quantile(0.25)
+        q3 = clipped[col].quantile(0.75)
+        iqr = q3 - q1
+        lower = q1 - factor * iqr
+        upper = q3 + factor * iqr
+        clipped[col] = clipped[col].clip(lower, upper)
+    return clipped
+
+
+def detect_noisy_rows(df: pd.DataFrame) -> np.ndarray:
+    features = df[BASE_FEATURES].copy()
+    features = features.replace([np.inf, -np.inf], np.nan)
+    features = features.fillna(features.mean(numeric_only=True))
+    detector = IsolationForest(
+        contamination=NOISE_CONTAMINATION,
+        random_state=RANDOM_STATE,
+        n_estimators=200,
+    )
+    return detector.fit_predict(features) == -1
+
+
+def preprocessing_graphs(pdf: PdfPages) -> None:
+    raw = load_raw_workbook()
+    numeric = raw.dropna(subset=["DEPT"]).sort_values("DEPT").reset_index(drop=True)
+    duplicate_full_rows = int(numeric.duplicated().sum())
+
+    before = minmax_frame(numeric, BASE_FEATURES)
+    after_iqr = iqr_clip_frame(numeric, BASE_FEATURES)
+    after = minmax_frame(after_iqr, BASE_FEATURES)
+
+    fig, ax = plt.subplots(figsize=(14, 6))
+    ax.boxplot(
+        [before[col].dropna() for col in BASE_FEATURES],
+        tick_labels=BASE_FEATURES,
+        patch_artist=True,
+        boxprops={"facecolor": "#8ecae6", "color": "#264653"},
+        medianprops={"color": "#b23a48"},
+        flierprops={"marker": ".", "markersize": 3, "alpha": 0.45},
+    )
+    ax.set_ylabel("Min-Max scaled value")
+    ax.set_title("Boxplot for Input-Feature Outliers Before IQR Treatment")
+    ax.tick_params(axis="x", rotation=45)
+    save(fig, "13_boxplot_outliers_before_treatment.png", pdf)
+
+    fig, ax = plt.subplots(figsize=(14, 6))
+    ax.boxplot(
+        [after[col].dropna() for col in BASE_FEATURES],
+        tick_labels=BASE_FEATURES,
+        patch_artist=True,
+        boxprops={"facecolor": "#95d5b2", "color": "#264653"},
+        medianprops={"color": "#b23a48"},
+        flierprops={"marker": ".", "markersize": 3, "alpha": 0.45},
+    )
+    ax.set_ylabel("Min-Max scaled value after IQR clipping")
+    ax.set_title("Boxplot for Input-Feature Outliers After IQR Treatment")
+    ax.tick_params(axis="x", rotation=45)
+    save(fig, "14_boxplot_outliers_after_treatment.png", pdf)
+
+    duplicate_counts = []
+    for col in BASE_FEATURES + TARGETS:
+        duplicate_counts.append(
+            {
+                "Column": col,
+                "Duplicated values": int(numeric[col].duplicated(keep=False).sum()),
+            }
+        )
+    duplicate_df = pd.DataFrame(duplicate_counts).sort_values("Duplicated values")
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.barh(duplicate_df["Column"], duplicate_df["Duplicated values"], color="#457b9d")
+    ax.set_xlabel("Count of values duplicated within each column")
+    ax.set_title(f"Histogram for Duplicate Data by Column (full-row duplicates = {duplicate_full_rows})")
+    save(fig, "15_histogram_duplicate_data.png", pdf)
+
+    noisy_mask = detect_noisy_rows(numeric)
+    fig, axes = plt.subplots(4, 3, figsize=(15, 12), sharex=True)
+    axes_flat = axes.ravel()
+    for ax, col in zip(axes_flat, BASE_FEATURES):
+        ax.scatter(
+            numeric.loc[~noisy_mask, "DEPT"],
+            numeric.loc[~noisy_mask, col],
+            s=5,
+            alpha=0.35,
+            color="#457b9d",
+            label="Normal",
+        )
+        ax.scatter(
+            numeric.loc[noisy_mask, "DEPT"],
+            numeric.loc[noisy_mask, col],
+            s=8,
+            alpha=0.75,
+            color="#d62828",
+            label="Noisy",
+        )
+        ax.set_title(col)
+        ax.set_xlabel("Depth")
+        ax.set_ylabel(col)
+    handles, labels = axes_flat[0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc="upper right", frameon=False)
+    fig.suptitle(f"Scattered Plot for Noisy Data Detected by IsolationForest (n = {int(noisy_mask.sum())})")
+    save(fig, "16_scattered_plot_noisy_data_all_inputs.png", pdf)
+
+    key_cols = ["GR", "ILD", "SFLU", "MSFL", "RHOB", "NPHI"]
+    fig, axes = plt.subplots(2, 3, figsize=(15, 7.5), sharex=True)
+    axes_flat = axes.ravel()
+    for ax, col in zip(axes_flat, key_cols):
+        y = numeric[col]
+        if col in {"ILD", "SFLU", "MSFL"}:
+            y = np.log10(y.clip(lower=1e-6))
+            ylabel = f"log10({col})"
+        else:
+            ylabel = col
+        ax.scatter(numeric.loc[~noisy_mask, "DEPT"], y.loc[~noisy_mask], s=6, alpha=0.35, color="#457b9d")
+        ax.scatter(numeric.loc[noisy_mask, "DEPT"], y.loc[noisy_mask], s=10, alpha=0.78, color="#d62828")
+        ax.set_title(col)
+        ax.set_xlabel("Depth")
+        ax.set_ylabel(ylabel)
+    fig.suptitle("Scattered Plot for Noisy Data on Key Well-Log Curves")
+    save(fig, "17_scattered_plot_noisy_data_key_logs.png", pdf)
 
 
 def target_distributions(data: pd.DataFrame, pdf: PdfPages) -> None:
@@ -338,6 +505,7 @@ def main() -> None:
     GRAPH_DIR.mkdir(parents=True, exist_ok=True)
 
     with PdfPages(PDF_PATH) as pdf:
+        preprocessing_graphs(pdf)
         target_distributions(data, pdf)
         depth_profiles(data, pdf)
         correlation_heatmap(data, pdf)

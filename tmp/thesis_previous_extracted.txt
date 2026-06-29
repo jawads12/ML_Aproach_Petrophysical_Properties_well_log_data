@@ -1,0 +1,3344 @@
+
+
+--- PAGE 1 ---
+A COMPARATIVE STUDY OF MACHINE LEARNING 
+MODELS FOR PREDICTING RESERVOIR PROPERTIES 
+USING WELL LOG DATA: A CASE STUDY OF THE 
+TITAS GAS FIELD 
+ 
+ 
+  Submitted by  
+ 
+ 
+ 
+Shahria Nayem Ahmed 
+Student ID - 1907010 
+Department of Petroleum and Mining Engineering 
+CHITTAGONG UNIVERSITY OF ENGINEERING AND TECHNOLOGY  
+CHATTOGRAM-4349,BANGLADESH 
+July 2025 
+
+
+
+--- PAGE 2 ---
+A COMPARATIVE STUDY OF MACHINE LEARNING 
+MODELS FOR PREDICTING RESERVOIR PROPERTIES 
+USING WELL LOG DATA: A CASE STUDY OF THE 
+TITAS GAS FIELD 
+ 
+A Project/Thesis: Part-II 
+PME 402 
+A thesis submitted in partial fulfilment of the requirements for the degree of 
+BACHELOR of SCIENCE in Petroleum and Mining engineering. 
+  Submitted by  
+Shahria Nayem Ahmed 
+Student ID - 1907010 
+ 
+ 
+ 
+ 
+ 
+Department of Petroleum and Mining Engineering 
+CHITTAGONG UNIVERSITY OF ENGINEERING AND TECHNOLOGY  
+CHATTOGRAM-4349,BANGLADESH 
+July 2025 
+
+
+
+--- PAGE 3 ---
+ 
+i
+Declaration 
+I hereby declare that the work contained in this Thesis has not been 
+previously submitted to meet requirements for an award at this or any other 
+higher education institution. To the best of my knowledge and belief, the Thesis 
+contains no material previously published or written by another person except 
+where due reference is cited. Furthermore, the Thesis complies with 
+PLAGIARISM and ACADEMIC INTEGRITY regulation of CUET. 
+ 
+ 
+ 
+------------------------------------------------- 
+Shahria Nayem Ahmed 
+Student ID - 1907010 
+Department of Petroleum and Mining Engineering 
+Chittagong University of Engineering & Technology (CUET) 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Copyright © Shahria Nayem Ahmed, 2025. 
+This work may not be copied without permission of the author or Chittagong University of 
+Engineering & Technology. 
+
+
+--- PAGE 4 ---
+ 
+ii
+Dedication  
+ 
+To my amazing family 
+and 
+To my beloved parents. 
+  
+
+
+--- PAGE 5 ---
+ 
+iii
+Approval/Declaration by the Supervisor(s) 
+This is to certify that  Shahria Nayem Ahmed has carried out this research work 
+under my supervision and that he has fulfilled the relevant Academic 
+Ordinance of the Chittagong University of Engineering and Technology  so that 
+he is qualified to submit the following Thesis in the application for the degree of 
+BACHELOR of SCIENCE in Petroleum and Mining Engineering. Furthermore, 
+the Thesis complies with the PLAGIARISM and ACADEMIC INTEGRITY 
+regulations of CUET. 
+ 
+ 
+ 
+ 
+------------------------------------------------------ 
+Mr. Amit Das 
+Assistant Professor  
+Department of Petroleum and Mining Engineering 
+Chittagong University of Engineering & Technology 
+
+
+--- PAGE 6 ---
+ 
+iv
+Acknowledgment 
+I would like to  express my deepest gratitude to  almighty Allah (SWT) for 
+granting me good health to complete this study. I would also  like to express my 
+gratitude to  everyone who has supported and guided me throughout the 
+completion of this thesis.  First and foremost, I  extend my sincere thanks to my 
+supervisor, Mr. Amit Das, Assistant Professor , Department of Petroleum and 
+Mining Engin eering, Chittagong University of  Engineering & Technology  for 
+his invaluable guidance, insightful suggestions  and continuous encouragement 
+during this research. His expertise and feedback have been instrumental in 
+shaping the direction and quality of this work. 
+Special thanks to my friends and family who offered constructive support 
+during my challenging times. Without their belief in my abilities, this journey 
+would not have been possible. 
+ 
+ 
+The author 
+Shahria Nayem Ahmed 
+July 2025  
+
+
+--- PAGE 7 ---
+ 
+v
+Abstract 
+Reservoir char acterization is a process to predict the key properties of a 
+reservoir which highlights the production feasibility of a field. Apart from this 
+reservoir characterization helps engineers to understand underground rock 
+formations to optimize hydrocarbon prod uction. Reservoir key properties can 
+be predicted by interpreting the well log data. Conventional methods are 
+mainly based on empirical models and manual analysis which can be time 
+consuming. It can also provide inaccurate predictions. However, with 
+advancements in machine learning (ML), data-driven approaches have emerged 
+as powerful tools for predicting reservoir properties accurately. This study 
+focuses on the application of different types of machine learning models for 
+predicting key reservoir properti es. By key reservoir properties, we are 
+referring to porosity, permeability and water saturation. Several well logs data 
+are used as the input parameters for this study . After, training the models, the 
+research focuses on the comparison of those ML models to check which one of 
+them provides the most accurate outcome. The models are then validated and 
+evaluated to evaluate their performance. This study is based on the Titas Gas 
+Field located in Bangladesh. Well log s data of well no 10 and 11 of Titas Gas 
+field were collected, preprocessed and are used to train the ML models . The 
+study not only bridges the gap between data science and petroleum engineering 
+but also opens new avenues for research and industrial applications in 
+hydrocarbon exploration and production from Bangladesh’s perspective. 
+ 
+ 
+  
+
+
+--- PAGE 8 ---
+ 
+vi
+       
+ 
+                                                                       
+                                                        ,          
+                                                                   
+                                                                       
+                                                         
+                                                                   
+                                     ,              (    )           
+    ,     -                                                          
+                                                                      
+                                                               
+                                                            , 
+                                                                 
+                                                                    
+          ,                                                        
+                                                              
+                                                                     
+                                                                   
+      ১০   ১১                                     ,    -         
+                                                             
+                                                                     
+           ,                                                      
+                                               
+. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+--- PAGE 9 ---
+ 
+vii
+Table of Contents 
+ABSTRACT ........................................................................................................................... .v 
+TABLE OF CONTENTS ..................................................................................................... vii 
+LIST OF FIGURES ................................................................................................................ ix 
+LIST OF TABLES .................................................................................................................. xi 
+NOMENCLATURE .............................................................................................................. xi 
+Chapter 1: INTRODUCTION ................................................................................. 1 
+1.1 BACKGROUND .......................................................................................................... 2 
+1.2 OBJECTIVES ................................................................................................................ 2 
+1.3 SIGNIFICANCE OF THE STUDY ............................................................................ 3 
+1.4 THESIS OUTLINE ...................................................................................................... 4 
+Chapter 2: LITERATURE REVIEW ....................................................................... 5 
+2.1 INTRODUCTION ....................................................................................................... 5 
+2.2 RELATED THEORIES ................................................................................................ 5 
+2.3 MACHINE LEARNING RELATED THEORIES .................................................... 7 
+2.4 PREVIOUS STUDIES ................................................................................................ 11 
+2.5 PURPOSE OF THIS STUDY .................................................................................... 13 
+Chapter 3: MATERIALS AND METHODOLOGY .......................................... 15 
+3.1 INTRODUCTION ..................................................................................................... 15 
+3.2 WORKFLOW OVERVIEW ...................................................................................... 15 
+3.3 DATA COLLECTION ................................................................................................ 16 
+3.4 WELL LOGS PARAMETER .................................................................................... 18 
+3.5 DATA PREPROCESSING ........................................................................................ 21 
+3.6 DATA SPLITING ....................................................................................................... 33 
+3.7 MACHINE LEARNING MODELS ......................................................................... 34 
+3.8 MODEL EVALUATION AND VALIDATION .................................................... 37 
+Chapter 4: RESULT ................................................................................................. 38 
+4.1 POROSITY PREDICTION ....................................................................................... 38 
+4.2 PERMEABILITY PREDICTION .............................................................................. 44 
+4.3 WATER SATURATION PREDICTION ................................................................. 50 
+Chapter 5: DISCUSSION ...................................................................................... 57 
+5.1 GENERAL .................................................................................................................. 57 
+5.2 POROSITY PREDICTION EVALUATION ........................................................... 57 
+
+
+--- PAGE 10 ---
+ 
+viii
+5.3    PERMEABILITY PREDICTION EVALUATION ....................................... 58 
+5.4 WATER SATURATION PREDICTION EVALUATION ..................................... 59 
+5.5 OVERALL PREDICTION EVALUATION ............................................................ 60 
+5.6    SHAP VALUE AND IMPORTANT FEATURES ........................................ 62 
+5.7    REGRESSION ANALYSIS…..............................................................................................64 
+5.8    LIMITATIONS, OPPORTUNITIES, AND RELIABILITY OF ML APPROACH…... ......67 
+Chapter 6: CONCLUSION .................................................................................... 69 
+6.1 CONCLUSION .......................................................................................................... 69 
+6.2 RECOMMENDATION FOR THE FURTHER STUDY ........................................ 69 
+REFERENCES .......................................................................................................... 71 
+ 
+ 
+ 
+
+
+--- PAGE 11 ---
+ 
+ix
+List of Figures 
+Figure No. 
+ 
+Figure Caption Page No. 
+Figure 3.1  Workflow Diagram of the Study  16 
+Figure 3.2  Well Log Data  17 
+Figure 3.3  Matrix Plot Missing Data of Well 10 24 
+Figure 3.4  Matrix Plot Missing Data of Well 11  24 
+Figure 3.5  Boxplot for Outliers before Treatment of Well  25 
+Figure 3.6  Boxplot for Outliers before Treatment of Well 11  26 
+Figure 3.7 Boxplot for Outliers after Treatment of Well 10  27 
+Figure 3.8 Boxplot for Outliers after Treatment of Well 11 28 
+Figure 3.9 Histogram for Duplicate Data of Well 10 29 
+Figure 3.10 Histogram for Duplicate Data of Well 11 29 
+Figure 3.11 Scattered Plot for Noisy data of Well 10  30 
+Figure 3.12 Scattered Plot for Noisy data of Well 11  30 
+Figure 3.13 Heatmap for Feature Selection of Well 10  32 
+Figure 3.14 Heatmap for Feature Selection of Well 11 33 
+Figure 3.15 Data Splitting  34 
+Figure 4.1 Linear Regression (Porosity) - Well 10  39 
+Figure 4.2 Linear Regression (Porosity) - Well 11 39 
+Figure 4.3 SVR (Porosity)-Well 10  40 
+Figure 4.4 SVR (Porosity)-Well 11  40 
+Figure 4.5 Random Forest (Porosity) - Well10  41 
+Figure 4.6 Random Forest (Porosity) - Well 11  41 
+Figure 4.7 XGBoost (Porosity) - Well 10 42 
+Figure 4.8 XGboost (Porosity) - Well 11  42 
+Figure 4.9 Deep Neural Network (Porosity) - Well 10  43 
+Figure 4.10 Deep Neural Network (Porosity) - Well 11  43 
+Figure 4.11 Linear Regression (Permeability) - Well 10 45 
+Figure 4.12 Linear Regression (Permeability) - Well 11  45 
+Figure 4.13 SVR (Permeability)-Well 10  46 
+Figure 4.14 SVR (Permeability)-Well 11  46 
+Figure 4.15 Random Forest (Permeability) - Well 10  47 
+Figure 4.16 Random Forest (Permeability) - Well 11  47 
+Figure 4.17 XGBoost (Permeability) - Well 10  48 
+Figure 4.18 XGboost (Permeability) - Well 11 48 
+Figure 4.19 Deep Neural Network (Permeability) -Well 10   49 
+Figure 4.20 Deep Neural Network (Permeability) - Well 11  49 
+Figure 4.21 Linear Regression (Water Saturation) - Well 10  51 
+
+
+--- PAGE 12 ---
+ 
+x
+Figure 4.22 Linear Regression (Water Saturation) - Well 11  51 
+Figure 4.23 SVR (Water Saturation)-Well 10  52 
+Figure 4.24 SVR (Water Saturation)-Well 11  52 
+Figure 4.25 Random Forest (Water Saturation) - Well 10  53 
+Figure 4.26 Random Forest (Water Saturation) - Well 11  53 
+Figure 4.27 XGBoost (Water Saturation) - Well 10  54 
+Figure 4.28 XGboost (Water Saturation) - Well 11  54 
+Figure 4.29 Deep Neural Network (Water Saturation)-Well 10  55 
+Figure 4.30 Deep Neural Network (Water Saturation)-Well 11  55 
+Figure 5.1 Comparison of Evaluation Metrics of Porosity  58 
+Figure 5.2 Comparison of Evaluation Metrics of Perm.  59 
+Figure 5.3 Comparison of Evaluation Metrics of SW 60 
+Figure 5.4 Radar Plot of R2  61 
+Figure 5.5 SHAP Value for Porosity  63 
+Figure 5.6 SHAP Value for Permeability  64 
+Figure 5.7 SHAP Value for Water Saturation  64 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+--- PAGE 13 ---
+ 
+xi
+List of Tables 
+ 
+Table No. Table Caption Page No. 
+Table 3.1 Dataset Table of Well 10  22 
+Table 3.2 Dataset Table of Well 11  22 
+Table 3.3 Dataset Describing Table of Well  22 
+Table 3.4 Dataset Describing Table of Well 11  23 
+Table 3.5 Total Missing Data of Well 10  23 
+Table 3.6 Total Missing Data of Well 11  23 
+Table 3.7 Recheck for Missing Data of Well  25 
+Table 3.8 Recheck for Missing Data of Well 11  25 
+Table 3.9 Dataset of Well 10 after Preprocessing  31 
+Table 3.10 Dataset of Well 11 after Preprocessing  31 
+Table 4.1 Metrics Values of Porosity Prediction of Well 10  38 
+Table 4.2 Metrics Values of Porosity Prediction of Well 11  38 
+Table 4.3 Metrics Values of Porosity Prediction (Average)  38 
+Table 4.4 Metrics Values of Permeability Prediction of Well 10  44 
+Table 4.5 Metrics Values of Permeability Prediction of Well 11  44 
+Table 4.6 Metrics Values of Permeability Prediction (Average)  44 
+Table 4.7 Metrics Values of SW Prediction of Well 10  50 
+Table 4.8 Metrics Values of SW Prediction of Well 11  50 
+Table 4.9 Metrics Values of SW Prediction (Average)  50 
+Table 5.1 Area Covered in Radar 61 
+Table 5.2 Best Predicative Model for each section 62 
+ 
+ 
+
+
+--- PAGE 14 ---
+ 
+xii
+Nomenclature 
+Symbols      
+∅ Porosity 
+K Permeability 
+Sw Water Saturation 
+pma   Matrix Density  
+pb  Bulk Density 
+pf Fluid Density 
+Rw Formation Water Resistivity 
+Rt True Formation Resistivity 
+ 
+Acronyms and Abbreviations 
+  
+CALI Caliper Log 
+DEPTH True Vertical Depth 
+DPHI Effective Porosity 
+DPOR Density Porosity 
+DRHO Corrected Density 
+DT Sonic Travel Time 
+GR Gamma Ray 
+ILD Deep Resistivity 
+MSFL Micro Spherical Log 
+NPHI Neutron Porosity 
+PEF Photoelectric Effect 
+PERM Permeability 
+RHOB Bulk Density Log 
+SFLU Shallow Resistivity 
+SP Spontaneous Potential  
+SW Water Saturation 
+ZDEN Zone Density 
+ 
+
+
+--- PAGE 15 ---
+ 
+Chapter 1: INTRODUCTION 1 
+Chapter 1: INTRODUCTION 
+Reservoir characterization is defined as the process of evaluating underground 
+rock formations to determine their potential for storing and transmitting 
+hydrocarbons. It is a key aspect to understand whether the formation is capable 
+enough to produce hydrocarbons at a feasible rate. It is certainly a critical part 
+of the exploration and production stage of a reservoir. 
+ 
+ By reservoir characterization, we basically refe r to major properties of a 
+formation such as porosity, permeability and water Saturation. Porosity is 
+defined as the available space to hold fluids in a rock whereas permeability 
+refers to how easily fluids can move in a rock. The water saturation, on the 
+other hand, refers to the amount of oil, gas and water in a pore space. These 
+properties help engineers to determine reservoir's storage capacity and to 
+understand t he flow behavior of the fluid.  Those key properties of the 
+formation can be obtained from w ell log data as it is the detailed record of rock 
+properties. Thus, well -log interpretation can provide many major properties of 
+a reservoir which are essential for optimizing production strategies. The 
+method of well log interpretation and reservoir chara cterization can be divided 
+into two sectors - Conventional approach and Advanced data-driven approach. 
+ 
+This study focuses on the Titas Gas Field, one of the largest producing gas fields 
+in Bangladesh. It is operated by Bangladesh Gas Fields Company Limite d 
+(BGFCL), located near the bank of Titas river at Bramonbaria. Despite of its 
+contribution to the national energy sector, detailed petro -physical 
+characterization using modern data -driven approaches remains limited. In this 
+research, well log data from we ll no 10 and 11 of the Titas field are being 
+used for detailed analysis of predicting porosity, permeability, and water 
+saturation from conventional well log data by machine learning models. 
+ 
+ 
+
+
+--- PAGE 16 ---
+ 
+Chapter 1: INTRODUCTION 2 
+1.1 BACKGROUND 
+ 
+For thousands of years, the energy demand has made the civilization innovate 
+many techniques and methods to extract hydrocarbons efficiently within a 
+sufficient amount of time. However, those conventional interpretations can be 
+time consuming and provide less efficiency in results as they are based on 
+manual analysis, empirical correlation and mathematical models. Conventional 
+method thus not only consumes more time but also causes wrong assumptions 
+during production stage. However, with the increasing availability of well log 
+data and advancements in artif icial intelligence, machine learning (ML) has 
+emerged as a powerful tool for reservoir characterization. 
+Machine learning algorithms can not only identify complex patterns within 
+large datasets but also find the missing key points in conventional methods. 
+ 
+There are many supervised machine learning models such as Random Forest, 
+Gradient Boosting, Neural Networks etc. Those models can be trained with 
+historical well log data to predict the properties with high accuracy. These 
+models use the data -driven appro ach which reduces reliance on manual 
+interpretation and improves prediction accuracy. This can lead to better 
+decision-making in field development, production optimization and 
+hydrocarbon recovery. 
+ 
+ 
+1.2 OBJECTIVES 
+ 
+The section discusses the key objective of t he study which highlights the goal of 
+the study. The objectives of this study are given below: 
+ 
+1. To preprocess and analyze well log data from Titash Gas field, well no 10 
+and 11. 
+2. To develop machine learning -based models for predicting key reservoir 
+properties from well log data. 
+
+
+--- PAGE 17 ---
+ 
+Chapter 1: INTRODUCTION 3 
+3. To assess model performance using appropriate metrics such as Mean 
+Squared Error (MSE), R² score, and Root Mean Squared Error  (RMSE) 
+techniques to ensure accuracy and generalization. 
+4. To compare different supervised learning algorithm s and check which 
+one provides better accuracy. 
+5. To find out the key parameters related to target variables and build a 
+relationship between non linear parameters. 
+ 
+1.3 SIGNIFICANCE OF THE STUDY 
+ 
+This study has various significance in terms of both academic and  industry 
+fields. The key significance of this study is given below: 
+ 
+1. Enables both cost -effective and time saving prediction of porosity, 
+permeability, and water saturation. 
+ 
+2. Reduces dependency on expensive and limited core analysis and well 
+testing. 
+ 
+3. Introduces modern data -driven techniques in Bangladeshi reservoir 
+studies. 
+ 
+4. Supports smarter decision -making in reservoir management, well 
+planning, and production optimization. 
+ 
+5. Future Research Scope and Industry Applications. 
+ 
+6. Enhance the machine learning application from Bangladesh Perspective. 
+ 
+7. Support the machine learning models to be used as complementary tools 
+alongside the conventional method. 
+ 
+ 
+
+
+--- PAGE 18 ---
+ 
+Chapter 1: INTRODUCTION 4 
+1.4 THESIS OUTLINE 
+ 
+Chapter 1 introduces the objective, significance and limitations of the study. 
+ 
+Chapter 2 highlights the literature review which includes related theories, 
+previous studies and studies based on Bangladesh’s perspective. 
+ 
+Chapter 3 describes the procedures and steps for the project including material 
+and methodology. 
+ 
+Chapter 4 gives the final result of the study and analyses the whole topic. 
+ 
+Chapter 5 discusses the outcome of the study and highlights the limitation and 
+scope of the study. 
+ 
+Chapter 6 is the conclusion part, where overall study is summarized. 
+
+
+--- PAGE 19 ---
+ 
+Chapter 2: LITERATURE REVIEW 5 
+Chapter 2: LITERATURE REVIEW 
+2.1 INTRODUCTION 
+ 
+Machine learning has revolutionized well log interpretation and reservoir 
+characterization. It improves the accuracy of predictions of key properties of the 
+reservoir. Even though traditional empirical and physics -based models have 
+been used for many years in th e petroleum industry, but their limitations have 
+led to the adoption of machine learning based approaches. The following 
+section discusses the related theories and previous studies that are related to 
+ML applications in reservoir characterization. 
+ 
+2.2 RELATED THEORIES  
+2.2.1 Petro-physical Theories and Models 
+ 
+2.2.1.1   Archie’s Equation (1942) – Water Saturation Estimation 
+ 
+Water saturation is a key property of a reservoir. Water saturation (SW) can be 
+estimated using Archie’s equation. This model is used to estimate the water 
+saturation (SW) of a reservoir rock based on the resistivity measurements. 
+ 
+   (   
+∅   
+* 
+ 
+Where,  
+ 
+   = Water saturation  
+   = Formation water resistivity = 0.115 Ωm for Titas gas field 
+     = True formation resistivity 
+∅ = Porosity 
+a, m, n = Empirical constants 
+For Titas gas field, a = 1, m= 2, n= 1.50. 
+
+
+--- PAGE 20 ---
+ 
+Chapter 2: LITERATURE REVIEW 6 
+ 
+Even though Archie’s equation provides a physics -based estimation for water 
+saturation, but its accuracy is affected by rock texture and mineralogy. ML 
+models can improve this accuracy of water saturation prediction by applying 
+non-linear relat ionships between resistivity, porosity and additional well log 
+features. 
+ 
+ 
+2.2.1.2 Density Porosity Equation 
+ 
+ 
+Density porosity of a reservoir formation can be calculated from density 
+porosity log. Effective porosity measured as a combination effect of den sity 
+porosity and neutron porosity. Density Porosity equation is given below:         
+ 
+ 
+∅         
+       
+ 
+ 
+Where, 
+ 
+ ∅D = Porosity 
+ pma = Matrix Density = 2.65 g/cm3 
+ pb = Bulk Density 
+ pf = Matrix Density = 1.0 g/cm3 
+ 
+If the Delta Density log (DRHO) value is more than its threshold value, Density 
+porosity value from density porosity log may be unreliable, thus in that case, 
+Neutron Porosity will be used as effective porosity. 
+ 
+                      
+ 
+ If the DRHO value is equal or less than the threshold value, than the average of 
+Density porosity and Neutron porosity will be used as effective porosity, 
+ 
+              
+                  
+ 
+
+
+--- PAGE 21 ---
+ 
+Chapter 2: LITERATURE REVIEW 7 
+ 
+2.2.1.3 Timur’s Simplified Permeability Equation 
+ 
+Permeability is defined as how easily hydrocarbons can flow through a rock. 
+This can be estimated by Timur’s simplified permeability equation, which 
+estimates the permeability based on porosity and water saturation . The 
+equation is given below: 
+ 
+    ∅ 
+    
+Where, 
+ 
+   = Permeability 
+ ∅= Porosity 
+   = Water saturation 
+  = Empirical constant = 10000 (standard) 
+ 
+The equation estimates permeability based on porosity and shows the impact of 
+porosity on permeability prediction. But this equation ignores vario us complex 
+geological variations. ML models correlate core data, provide more accurate 
+estimation of permeability. 
+ 
+2.3 MACHINE LEARNING RELATED THEORIES  
+ 
+2.3.1 Data Preprocessing 
+ 
+Raw data contains missing values, duplicate values, noisy values and outliers. If 
+the data is used without cleaning, it can cause lower accuracy while predicting 
+the parameter. 
+ 
+2.3.1.1 Missing Data Treatment 
+ 
+There are several method are used to handle the missing values. Eliminating 
+row with missing value is the most common one. A lso imputing mean value to 
+the null values also used in missing data treatment. Advance method like KNN-
+
+
+--- PAGE 22 ---
+ 
+Chapter 2: LITERATURE REVIEW 8 
+imputer also used in this purpose. But for simplicity and effectiveness, mean 
+method for eliminating missing values was used in this study. 
+ 
+Mean Imputation 
+ 
+Mean imputation is a simple statistical method that replaces missing values in a 
+given feature in a column with the mean or average value  of the observed 
+values of that feature. This technique assumes that the missing data are missing 
+at random (MAR) and that the mean is a good representative  of the underlying 
+distribution of the observed data. 
+ 
+Mathematically, if a feature X has missing values, the missing entries are 
+replaced as: 
+        
+   
+ ∑  
+ 
+   
+ 
+ 
+ 
+2.3.1.2 Outliers Treatment 
+ 
+Outlier in dataset is major concern in developing machine learning models. 
+Outliers influence the model to learn the unrealistic pattern. Thus it is removed 
+before the data splitting process. There are mainly two methods are used for 
+this purpose. One is Interquartile Range (IQR)  method and another is Z -score 
+method. In this study, IQR method was implemented to remove outliers. 
+ 
+Interquartile Range (IQR) method 
+ 
+IQR method is a widely used statistical technique for detecting outliers in 
+numerical d atasets. It is based on the spread of the middle 50% of data, 
+calculated as the difference between the third quartile (Q3) or 75% of dataset 
+and the first quartile (Q1)  or 25% of dataset . Q3 and Q1 then used to calculate 
+the IQR value. This IQR value is used to determine lower limit and upper limit. 
+ 
+          
+                       
+                       
+ 
+
+
+--- PAGE 23 ---
+ 
+Chapter 2: LITERATURE REVIEW 9 
+Any values that fall outside this range will be treated and eliminated as part of 
+the outlier treatment. 
+ 
+ 
+2.3.1.3 Duplicate Value Treatment 
+ 
+If a value repeated more  than once it is considered as a duplicate value. Lower 
+percentage of duplicate value is not a concerning thing, but higher percentage 
+of duplicate value can alter the prediction efficiency. Duplicated data can be 
+eliminated simply using the Pandas library. 
+ 
+ 
+2.3.1.4 Noisy Data Treatment  
+ 
+Noisy data are mainly unrealistic, irrelevant or error dataset. High degree of 
+noisy dataset can affect the performance of predictive model. There are several 
+methods to eliminate the noisy value. In this study, Binning m ethod is used to 
+conduct the outlier treatment.  
+ 
+Binning Method  
+ 
+Binning is a data pre -processing technique used to convert continuous 
+numerical variables into discrete intervals or categories, often referred to as 
+"bins." This method helps reduce the ef fects of minor observation errors and 
+handle noisy data by grouping similar values together. Binning can be 
+performed using techniques such as equal-width binning , where the range of 
+data is divided into intervals of the same size, or equal-frequency binni ng, 
+where each bin contains the same number of data points. 
+ 
+ 
+2.3.2 Data Normalization 
+ 
+Data normalization technique is used to convert the dataset into specific range, 
+usually from 1 to 0. This done in order to ensure that there is no dataset with 
+larger numerical value influencing  the model while predicting.  One of the 
+common methods used to data normalization is Min-Max scaling method. 
+ 
+
+
+--- PAGE 24 ---
+ 
+Chapter 2: LITERATURE REVIEW 10 
+Min-Max Scaling Method 
+ 
+Min-Max scaling method rescales numerical features to a fixed range, typically 
+between 0 and 1. This is achieved using the formula: 
+ 
+               
+          
+ 
+ 
+Where, X is the original value, Xmin and Xmax are the minimum and maximum 
+values of the feature, respectively. Min -Max Scaling preserves the original 
+distribution and relationships between values while ensuring that all features 
+contribute equally to model training. 
+ 
+ 
+2.3.3 Feature Selection 
+ 
+Feature selection is a very crucial step, as it  involves identifying and retaining 
+the most relevant input variables for predictive model. The goal is to reduce 
+dimensionality, improve model performance, and enhance interpretability by 
+eliminating redundant, irrelevant, or noisy features. Visualizing the input 
+feature using Heat-map correlation is a common method. 
+ 
+Heat-map Correlation  
+ 
+Heat-map based feature selection works by visualizing the correlation matrix, 
+which shows the pairwise correlation coefficients between features and the 
+target variable. Features that exhibit a strong positive or negative correlation 
+with the target are considered relevant and are selected, while those with low or 
+zero correlation are considered less useful and may be excluded. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+--- PAGE 25 ---
+ 
+Chapter 2: LITERATURE REVIEW 11 
+2.4 PREVIOUS STUDIES  
+ 
+2.4.1 Recent studies  
+ 
+ Hadavimoghaddam et al. (2021) used machine learning algorithms s uch 
+as XGboost, LightGBM, AdaBoost, CatBoost and Super Learner to 
+predict water saturation data from well log data. Among those 
+algorithms XGBoost and Super Learner were the most efficient ones as 
+those algorithms predicted water saturation without relying  on 
+resistivity log data.[1] 
+ 
+ 
+ Zhang et al. (2022) developed machine learning models such as K-nearest 
+neighbors (KNN), Support vector regression (SVR) and Random Forest 
+(RF) and LightGBM based on mathematical linear or nonlinear 
+relationship between well logs petrophysical properties such as porosity, 
+permeability and water saturation. Among them, LightGBM produced 
+more reliable results. To enhance the predicting quality and reliability, a 
+hybrid algorithm named CRBM -Bayes-LightGBM was introduced to 
+predict porosity permeability and water saturation.[2] 
+ 
+ Cheddad (2023) trained three machine learning algorithms, namely 
+Artificial Neural Network (ANN), Random Forest Classifier (RFC), and 
+Support Vector Machine (SVM) to predict permeability logs from 
+conventional logs and compare the models. The performance of the 
+models is comparable, with a slight advantage observed for the ANN 
+model in terms of performance.[3] 
+ 
+ Nugroho et al. (2024) used Random Forest and XGBoosting algorithms to 
+predict effective porosity a nd permeability. The results of the prediction 
+model were then optimized by GridSearchCV (GS). XGBoosting was 
+found to be the most effective one in predicting porosity while Random 
+Forest provided better effectiveness with permeability.[4] 
+ 
+ Smith et al. (2 024) utilized a combination of well log interpretation and 
+various machine learning models to evaluate reservoir properties. At the 
+
+
+--- PAGE 26 ---
+ 
+Chapter 2: LITERATURE REVIEW 12 
+initial stage, conventional petrophysical methods were applied to 
+analyze well log data. To improve the accuracy, various ML  models like 
+Adaptive Neuro -Fuzzy Inference System, Extreme Learning Machine, 
+Multi Gene Genetic Programming, Decision Tree and Adaptive Boosting 
+were used. AdaBoost model provided the best performance with the 
+lowest error percentage.[5] 
+ 
+ Youcefi et al. ( 2024) trained Support Vector Regression (SVR), Multi -
+Layer Perceptron (MLP), Random Forest Regression (RFR) and XGBoost 
+models to enhance porosity prediction. These models are then integrated 
+using multiple stacking ensemble techniques. Among them, Weighte d 
+Averaging outperformed the Bayesian Model Averaging and RFR as 
+Meta learner.[6] 
+ 
+ 
+ Mehran Rahimi et al (2022) used Random Forest (RF) algorithms and 
+geostatistics modeling to estimate reservoir facies. This approach 
+enhances the facies classification cont ributing to improved reservoir 
+characterization.[7]   
+ 
+ 
+ David A. Wood (2024) predicted key reservoir properties such as 
+porosity, permeability and water saturation by using an optimized 
+nearest-neighbor machine learning approach from well log data.[8] 
+ 
+ 
+ Edwin E. Nyakilla et al. (2024) developed AdaBoost model to evaluate 
+porosity and permeability and compared it with methods such as 
+Support Vector Machine (SVM), Gaussian process regression (GPR), 
+Multivariate analysis, and Backpropagation Neural Network (BP NN). 
+AdaBoost outperformed the other models in this study.[9] 
+ 
+ 
+ 
+ 
+
+
+--- PAGE 27 ---
+ 
+Chapter 2: LITERATURE REVIEW 13 
+2.4.2 Studies on Bangladesh Perspective  
+ 
+ Reza et al (2013) used conventional method to analysis the petrophysical 
+parameters of the gas zone for reservoir characterization of Rashipdur 
+Gas Field, Bangladesh.[10] 
+ 
+ M.S Shah et al (2021) evaluated the petrophysical properties of the Titas 
+gas field using Quick Log Analysis Tool (QLAT). The study was based 
+on computer-processed interpretation inputting the various well log data 
+such as gamma -ray (GR), density log (RHOB), density -porosity (DPHI), 
+neutron porosity (NDHI), resistivity logs, etc.[11]   
+ 
+ 
+While these studies incorporate several reservoir properties from well log data, 
+but they are not based on machine learning models or advanced data driven  
+approaches creating a big scope for research with the gas fields of Bangladesh. 
+ 
+2.5 PURPOSE OF THIS STUDY 
+The key purpose of this study is to develop machine learning models to predict 
+reservoir properties. There have been several studies have conducted with  
+reservoir characterization based on the gas fields of Bangladesh. However, 
+almost all those studies focus on the conventional approach to evaluate 
+reservoir characterization. 
+ 
+This study mainly focuses on evaluating reservoir properties  of Titas gas field , 
+well no 10 and 11,  using machine learning models to enhance the accuracy of 
+the prediction. This study also focuses on finding the most efficient algorithm to 
+predict reservoir characterization at a faster speed and higher accuracy. From 
+Bangladesh's perspective, this can open up a new scope of research to embrace 
+the advancement of machine learning in the petroleum industry as well.
+
+
+--- PAGE 28 ---
+
+
+
+--- PAGE 29 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 15 
+Chapter 3: MATERIALS AND METHODOLOGY 
+3.1 INTRODUCTION  
+ 
+To develop an effec tive machine learning model for reservoir characterization 
+using well log data,  we need a structured approach and path to reach our goal. 
+This chapter shows and discusses the key steps that have taken to collect, 
+process and analyze well log data to build machine learning models that can 
+predict reservoir characteris tics efficiently . The methodology is designed to 
+ensure that the machine learning models provide reliable and accurate 
+predictions that can be used in real-world reservoir studies. 
+ 
+3.2 WORKFLOW OVERVIEW 
+ 
+The workflow overview showcases the key steps of this s tudy in a flow chart 
+including data collection, data pre -processing, model training & selection, 
+model evaluation & validation and deployment & interpretation. The flowchart 
+is shown below: 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+--- PAGE 30 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 16 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                      Figure 3.1: Workflow diagram of the study 
+ 
+3.3 DATA COLLECTION 
+ 
+In this study, the data was collected from the Titas Gas Field, one of the largest 
+gas producing fields of Bangladesh. It is operated under BGFCL (Bangladesh 
+Gas Fields Company Limited), a subsidiary of PetroBangla. The data 
+Data 
+Collection 
+Data Pre-
+processing 
+Model 
+Evaluation 
+Model 
+Training 
+Data 
+Splitting 
+Comparison 
+Data  
+Cleaning 
+Noisy Data   
+Treatment 
+Duplicate 
+Data 
+Treatment 
+Missing Data 
+Treatment 
+Outliers 
+Treatment 
+Feature 
+Selection 
+Data 
+Normalizatio
+n 
+
+
+
+--- PAGE 31 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 17 
+permission was granted by PetroBanlga. Several well logs data of well no 10 
+and 11 were collected from the Titas Gas field site located in Bramanbaria. The 
+well no 10 is located at the location A of the field and well no 11 is located a t the 
+location B of the gas field.  
+ 
+3.3.1 Dataset Description 
+ 
+The dataset contains well log measurements for su bsurface geological 
+formations of well no 10 and 11 of Titas gas field. Data visualization can be 
+observed by the following un-digitized well logs response.  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                          Well 10                                                             Well 11 
+ 
+Fig 3.2: Well Log Data  
+ 
+These well logs data are the input feature for the machine learning models. On 
+the other hand derived pr operties from well logs data, such as porosity, 
+
+
+
+--- PAGE 32 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 18 
+permeability and water saturation, are the targeted param eter for machine 
+learning models. 
+ 
+3.4 WELL LOGS PARAMETER 
+ 
+3.4.1 Input Parameters 
+ 
+The following well log parameters will serve as the primary input param eters 
+for training the machine learning models to predict reservoir properties: 
+ 
+ 
+Depth 
+ 
+The Depth log is the foundational measurement, acting as the vertical ruler for 
+all other data points. It precisely indicates how far down into the Earth's crust 
+each measurement was taken 
+ 
+Gamma Ray Log (GR) 
+ 
+The Gamma Ray (GR) log is like a natural radioactivity scanner for rocks. It 
+measures the natural gamma radiation emitted by formations, which is 
+typically higher in clay -rich rocks due to their potassium, uranium , and 
+thorium content 
+. 
+Caliper Log (CALI) 
+ 
+The Caliper (CALI) log provides a direct measurement of the wellbore's actual 
+diameter. It helps engineers assess the borehole's condition, identify zones of 
+instability, and ensure accurate interpretation of other logs. 
+ 
+Spontaneous Potential Log (SP) 
+ 
+The Spontaneous Potential (SP) log detects natural electrical currents generated 
+by the interaction between drilling mud  and formation fluids. It acts as an 
+indicator for identifying permeable zones and estimating their shale content 
+
+
+--- PAGE 33 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 19 
+ 
+ 
+ 
+Spherically Focused Log - Shallow (SFLU) 
+ 
+The SFLU (Spherically Focused Log - Shallow) is a resistivity log designed to 
+measure the electrical resistance of the formation  at a relatively shallow depth. 
+It helps differentiate between zones containing resistive hydrocarbons and 
+conductive water in the invaded zone near the wellbore 
+ 
+Micro-spherically Focused Log (MSFL) 
+ 
+The MSFL (Micro -spherically Focused Log)  is an even shallower resistivity 
+measurement than SFLU, providing a very clos e-up view of the electrical 
+properties right at the borehole wall within the invaded zone. 
+ 
+Induction Log - Deep (ILD) 
+ 
+The ILD is a crucial resistivity log that measures the electrical resistance of the 
+formation far beyond the drilling mud's invaded zone , reaching into the 
+undisturbed reservoir. ILD log is a primary indicator for identifying 
+hydrocarbon-bearing zones and estimating their saturation. 
+ 
+Bulk Density Log (RHOB) 
+ 
+The Bulk Density (RHOB)  log measures the electron density of the rock, which 
+is then converted into its bulk density. This log is fundamental for identifying 
+different rock types and also used in calculating the rock's porosity. 
+ 
+Density Correction Log (DRHO) 
+ 
+The Density Correction (DRHO) log is a quality control measure for the RHOB 
+log. A significant DRHO value alerts engineers that the RHOB reading might be 
+compromised, prompting careful consideration or correction for more reliable 
+porosity calculations. 
+ 
+Photoelectric Factor Log (PEF) 
+
+
+--- PAGE 34 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 20 
+ 
+The Photoelectric Factor (PEF)  log measures t he photoelectric absorption index 
+of the formation, a property highly sensitive to the rock's mineral composition. 
+Different mi nerals have distinct PEF values, allowing geologists to precisely 
+determine the lithology of the formation. 
+ 
+Sonic Transit Time Log (DT) 
+ 
+The Sonic Transit Time (DT) log measures the time it takes for a sound wave to 
+travel through a specific distance of rock . This log is primarily used to calculate 
+sonic porosity. 
+ 
+Z-Axis Density Log (ZDEN) 
+ 
+The Z-Axis Density (ZDEN)  log is essenti ally another term used for the Bulk 
+Density (RHOB) measurement. It refers to the density measurement taken along 
+the vertical axis of the logging tool 
+ 
+Neutron Porosity Log (NPHI) 
+ 
+The Neutron Porosity (NPHI) log measures the hydrogen content within the 
+formation, which is directly proportional to the amount of fluid in the pore 
+spaces. Therefore, it's a direct measure of the rock's porosity 
+ 
+Density Porosity Log (DPOR) 
+ 
+The Density Porosity (DPHI) log  is a calculated porosity value derived directly 
+from the Bulk Density (RHOB)  log. It is a fundamental method for quantifying 
+the volume of void space within the reservoir rock. 
+ 
+Shorter Normal Resistivity Log (SN) 
+ 
+The Shorter Normal Resistivity (SN) log is another type of resistivity 
+measurement, generally pr oviding a relatively shallow depth of investigation 
+compared to the deep induction logs. It helps characterize the electrical 
+resistance of the invaded zone, where drilling mud filtrate has displaced some 
+of the original formation fluids 
+
+
+--- PAGE 35 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 21 
+ 
+ 
+. 
+3.4.2 Target Variables  
+ 
+The machine learning models will be trained  to predict the following  reservoir 
+properties: 
+ 
+Derived Porosity (DPHI) 
+ 
+Derived porosity  is the porosity value which has derived from logs or 
+calculations considering all the other factors, such as NP HI, RHOB and DRHO. 
+It is also known as effective porosity. Effective p orosity indicates the capacity of 
+the reservoir to store fluids. It  is fundamental for permeability and water 
+saturation modeling. 
+ 
+ 
+ Water Saturation (SW) 
+ 
+SW indicates the fraction of pore space of rock which is  filled with water. It’s 
+crucial for reservoir evaluation. It helps in differentiate  between water and 
+hydrocarbons zone. 
+ 
+PERM (Permeability) 
+ 
+Permeability measures the ability of the rock to transmit fluids. It is highly 
+influenced by porosity and pore connectivity. Predicting permeability can be 
+difficult as it fluctuates quite often. Thus we can encounter with lower 
+prediction accuracy. 
+ 
+3.5 DATA PREPROCESSING  
+Data pre-processing is a very crucial stage as the accuracy of the models depend 
+on how well the data was processed. Raw data can contain null value s, noisy 
+data, outliers and duplicate value s. These can effects the quality of data. Data 
+pre-processing ensures the quality of the data before using it to evaluate the 
+models. 
+
+
+--- PAGE 36 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 22 
+ 
+3.5.1 Data Import 
+ 
+Before the data preprocessing process, the dataset of each well were imported 
+in Google Colab as a CSV  file. The Pandas library was used to import th e data 
+into Colab. To check the first few row of dataset, the head function was used. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Table 3.1: Dataset Table of Well 10 
+ 
+ 
+ 
+ 
+ 
+Table 3.2: Dataset Table of Well 11 
+3711 data points with 17 columns were observed for well no 11 and 5693, data 
+points with 15 columns were observed for well no 10. To obtain  further 
+information of dataset, such as mean values, maximum values, minimum 
+values, described function was used. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Table 3.3: Dataset Describing Table of Well 10 
+
+
+
+--- PAGE 37 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 23 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Table 3.4: Dataset Describing Table of Well 11 
+ 
+3.5.2 Handling Missing Data:  
+ 
+The first problem that we encou ntered with dataset is missing or null value of 
+data. To  identify missing values in the dataset, the is -null function  was used . 
+The missing values of each column were presented as the missing count and 
+missing percentage 
+ 
+ 
+ 
+Table 3.5: Total Missing Data of Well 10 
+ 
+ 
+ 
+ 
+ 
+Table 3.6: Total Missing Data of Well 11 
+ 
+ 
+ 
+To visualize the location of the missing data, a matrix plot was generated u sing 
+the M issingno library. This graphical representation helped to find out any 
+patterns or structures in the distribut ion of missing values across both columns 
+and rows. This is very essential to understand which missing treatment should 
+be used to handle missing data. 
+ 
+ 
+
+
+
+--- PAGE 38 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 24 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 3.3: Matrix Plot for Missing Data of Well 10 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 3.4: Matrix Plot for Missing Data of Well 11 
+ 
+Once the missing values were detected and visualized,  the mean method was 
+applied to eliminate the missing values  from dataset. Mean value of each 
+column was assigned to null value of each column. As the missing percentage is 
+small this method is applicable. Missing values were rechecked again to ensure 
+the success of this method.  
+. 
+ 
+ 
+ 
+ 
+         Table 3.7: Recheck for Missing Data of Well 10 
+
+
+
+--- PAGE 39 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 25 
+ 
+ 
+ 
+ 
+ 
+Table 3.8: Recheck for Missing Data of Well 11 
+ 
+3.5.3 Outliers Detection and Removal 
+  
+Due to environmental noise, calibration errors of tool or human errors, well logs 
+data can contain outliers. Outliers can influence models to learn incorrect 
+patterns. Thus, it is important to detect and remove those outliers.  
+Outliers can be detected usi ng the boxplot.  Boxplot of each parameter used to 
+detect the outliers in each parameter. The doted points on the boxplot graph are 
+considered as outliers. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 3.5: Box Plot for Outliers before Treatment Well 10 
+ 
+
+
+
+--- PAGE 40 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 26 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 3.6: Box Plot for Outliers before Treatment Well 11 
+ 
+Feature Variable Outliers 
+ 
+The parameters which contain severe amount of dotted point, needs to be 
+treated as those parameters contain huge amount of outliers. On the other hand, 
+in some parameters, no or  few dotted point was spotted, indicating these 
+parameters are free from outliers. These parameters can be dropped during 
+outlier treatment process.  
+ 
+Target Variable Outliers 
+ 
+The parameters DPHI, PERM, and SW are target variable. Outlier treatment on 
+target variable can be unreliable as outliers in target variables have significance 
+as well.  Thus, no outlier treatment was conducted on the se parameters . 
+However unrealistic values of target variable s was treated, such as porosity of 
+Titas gas field can’t ex ceed to 35%, thus any value beyond 0.35 are considered 
+as an unrealistic value. Similarly permeability and water saturation can’t go 
+beyond 800mD and 1.0 respectively. These values can’t be negative or zero as 
+well. 
+
+
+
+--- PAGE 41 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 27 
+Outlier Treatment 
+ 
+Outliers in the input  variable were treated with IQR method. In this method, 
+parameters were set between a  limit ranging from 75% to 25% of concentration. 
+Values outside this range were eliminated. 
+ 
+Invalid Value Removal 
+ 
+Any values beyond 0.35 for porosity were eliminated. An y values beyond 
+800mD for permeability were eliminated. Any values beyond 1.0 for water 
+saturation were eliminated. All the negative values of these parameters were 
+eliminated. 
+ 
+Post-Treatment Validation 
+ 
+After the treatment process, boxplot was again  plotted to check the success of 
+outlier treatment process. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 3.7: Box Plot for Outliers after Treatment of Well 10 
+
+
+
+--- PAGE 42 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 28 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 3.8: Box Plot for Outliers after Treatment of Well 11 
+ 
+ 
+ 
+3.5.4 Duplicate Data Handling 
+ 
+Dataset have multiple duplicate data, these can have effect on the quality of the 
+data. To check the total number of duplicate data, duplicated function  was 
+used. To visualize the number of duplicated values in each parameter,  
+Matplotlib function was used to plot th e histogram of both of the well. After 
+analysing the dataset, only the duplicates of entire row were eliminated using 
+the drop function. 
+ 
+ 
+ 
+ 
+ 
+
+
+
+--- PAGE 43 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 29 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 3.9: Histogram for Duplicate Data Well 10 
+ 
+ 
+After detecting the duplicate values, we use the drop  function to remove the 
+duplicate values and keeping only the first occurrence of each row. Then we 
+check again with duplicated function to ensure we have removed the duplicate  
+values. 
+ 
+ 
+ 
+ 
+ 
+Fig 3.10: Histogram for Duplicate Data Well 11 
+ 
+3.5.5 Noisy Data Treatment 
+ 
+Noisy data are mainly irrelevant data, error data or inconsistent data that have 
+negative impact on the performance of machine learning model. Thus detecting 
+noisy data and eliminating noisy data are the key steps in data pre-processing.  
+ 
+First the noisy data were detected using IsolationForest algorithm, which 
+identifies anomalous data points based on their isolation in feature space . To 
+visualize the noisy data distribution across the all column, scattered plot  was 
+used. In the scattered plot, the nois y values were shown by red dot. T otal 
+numbers of 202 rows and 170 rows were detected for  well 10 and 11 
+respectively.  
+
+
+
+--- PAGE 44 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 30 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 3.11: Scattered Plot for Noisy Data of Well 10 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 3.12: Scattered Plot for Noisy Data of Well 11 
+
+
+
+--- PAGE 45 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 31 
+ 
+To remove the noisy values, Binning Discretization method was utilized. In this 
+method e ach numeric feature was divided into bins, and noisy values were 
+replaced with their corresponding bin labels, effectively converting continuous 
+data into ca tegorical intervals. This approach reduced the impact of noise by 
+grouping similar values while simplifying the data for further analysis.  
+ 
+3.5.6 Data Normalization 
+ 
+Data normalization use to scale features to a common range, ensuring that no 
+single feature dominates due to its scale.  The range usually varies from 1 to 0.  
+To normalize the data, the Min -Max scaling method  was implimented. After 
+data normalization process, the dataset is ready to use in the machine learning 
+model. There were 3397 data points for well 11 and 4032 data points for well 10 
+after data pre-processing. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Table 3.8: Dataset of Well 10 after Preprocessing  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Table 3.9: Dataset of Well 11 after Preprocessing  
+ 
+3.5.7 Feature Engineering and Selection 
+ 
+Feature selection is very crucial steps as it helps to visualize which input feature 
+correlates better with the target variable. Feature that does not correlate well 
+with target variable, dropped during model development.  
+
+
+
+--- PAGE 46 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 32 
+ 
+To understand the correlation between the parameters, a  correlation heat-map 
+was employed to support feature selection by identifying the strength and 
+direction of relationships between input  features and target variables. Features 
+showing strong positive or negative correlation (|r| ≥ 0.20) with the target were 
+considered important and retained.  On the other hand,  features with very low 
+correlation (|r| < 0.20 ) were considered less inform ative and removed. Also,  
+highly correlated features with one another (|r| ≥ 0. 85) were examined to avoid 
+multicollinearity, retaining only one among them based on relevance. This 
+approach helped reduce redundancy and improve model performance. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 3.13: Heatmap for Feature Selection of Well 10 
+ 
+
+
+
+--- PAGE 47 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 33 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 3.14: Heatmap for Feature Selection of Well 11 
+ 
+3.6 DATA SPLITING 
+ 
+Data splitting is done to evaluate a machine learning model’s performance on 
+unseen data by dividing the dataset into three groups: 
+ 
+ Training set (70%) : Used to train the machine learning model to learn 
+patterns from the data. 
+ 
+ Testing set (15%) : Used to evaluate the final model’s performance on 
+unseen data. 
+ 
+
+
+
+--- PAGE 48 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 34 
+ 
+ 
+ 
+ Validation set (15%) : Used during model development to tune hyper  
+parameters and select the best model without affecting the test results. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 3.15: Data Splitting 
+ 
+ 
+3.7 MACHINE LEARNING MODELS  
+In this study, several supervised machine learning models were used to predict 
+porosity, permeability and water saturation using well log data. The selected 
+models can be categorized based on their underlying mathematical frameworks 
+and learning paradigms. The models include linear models, tree-based models, 
+gradient boosting models, and deep networking model.  
+ 
+3.7.1 Linear Models 
+Linear models assume a linear relationship between the input features and the 
+target variable. They are simple, interpretable, and computationally efficient, 
+making them a good baseline for regression tasks. 
+Preprocessed 
+Data (100%) 
+Testing  
+Dataset (15%) 
+Test-Valid 
+Dataset (30%) 
+Training 
+Dataset (70%) 
+Validating 
+Dataset (15%) 
+
+
+
+--- PAGE 49 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 35 
+ 
+ Linear Regression 
+Linear Regression predicts the target variable as a weighted sum of the input 
+features: 
+                      
+Where, W1, W2….Wn are the feature weights and b is the bias term. The model 
+minimizes the mean squared error between predicted and actual values. 
+Although it is limited to capturing linear patterns, it prov ides a strong 
+foundation for more complex models. 
+ 
+3.7.2 Support Vector Machine Models 
+Support Vector Machine (SVM) is a supervised machine learning algorithm 
+used for both classification and regression tasks. It works by finding the optimal 
+hyper-plane that bes t separates data points of different classes or predicts 
+continuous values with minimal error. 
+ 
+Support Vector Regression (SVR) 
+SVR is an extension of Support Vector Machines (SVM) for regression tasks. It 
+attempts to fit a function within an epsilon-insensitive tube, ensuring that errors 
+within this margin are ignored. The objective is to find a hyperplane that 
+minimizes deviation beyond this tube. SVR can behave as a linear or nonlinear 
+model depending on the choice of kernel (e.g., linear, polynomial, RBF). 
+ 
+3.7.3 Tree-Based Models 
+Tree-based models use a flowchart-like structure to make decisions by splitting 
+the data into subsets based on feature thresholds. 
+ 
+
+
+--- PAGE 50 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 36 
+ 
+Random Forest Regressor 
+Random Forest is an ensemble technique that builds multiple decision trees 
+using boot strapped samples of the data and aggregates their outputs. Each tree 
+is trained on a random subset of features, which helps to reduce overfitting and 
+improve generalization. The final prediction is the average of predictions from 
+all trees in the forest. 
+ 
+3.7.4 Gradient Boosting Models 
+Gradient boosting models construct an ensemble of weak learners (typically 
+decision trees) in a sequential manner. Each new tree attempts to correct the 
+residual errors of the previous ensemble using gradient descent optimization. 
+XGBoost (Extreme Gradient Boosting) 
+XGBoost is a high-performance gradient boosting library that introduces 
+regularization and advanced optimization techniques such as second-order 
+gradient approximation, shrinkage, and column sampling. It is known for its 
+speed and predictive power, especially in structured/tabular data. 
+ 
+3.7.5 Deep Network Model 
+Neural networks are flexible, data-driven models capable of learning both 
+linear and highly nonlinear relationships. 
+Deep Neural Network  
+Neural network is a type of feed forward neural network consisting of input, 
+hidden, and output layers. Each neuron computes a weighted sum of its inputs 
+followed by a nonlinear activation function. The network is trained using back 
+propagation and gradient descent to minimize prediction error. MLPs are 
+powerful function approximators, especially effective when sufficient data is 
+available. 
+
+
+--- PAGE 51 ---
+ 
+Chapter 3: MATERIALS AND METHODOLOGY 37 
+3.8 MODEL EVALUATION AND VALIDATION 
+ 
+To evaluate the performance of a model, evaluation and validation are required. 
+It highlights the accurac y and reliability of a model. Model performance is 
+evaluated and validated using the following metrics: 
+ 
+ 
+Mean Absolute Error (MAE):  It m easures the average of absolute errors 
+between predicted values and actual values. 
+ 
+ 
+      
+ ∑|     ̂ |
+ 
+   
+ 
+ 
+Root Mean Squared Error (RMSE):  A metric for the average deviation of the 
+model’s predictions from actual values.  It is simply defined as the square root 
+of the expectation of the squared difference between estimated and actual 
+values. 
+ 
+ 
+      √ 
+ ∑      ̂   
+ 
+   
+ 
+ 
+Coefficient of Determination (R²):  The coefficient of determination (R²) is a 
+number between 0 and 1 which measures how well a statistical model predicts 
+an outcome. Number 1 refers to a reliable outcome. 
+ 
+ 
+ 
+       
+∑       ̂    
+   
+∑        ̅̅̅  
+   
+ 
+ 
+
+
+--- PAGE 52 ---
+ 
+Chapter 4: RESULT 38 
+Chapter 4: RESULT 
+In this study, we trained five models from each type of class to predict porosity, 
+permeability and water saturation . This chapter showcases the results that we 
+obtained from the study. 
+4.1 POROSITY PREDICTION 
+ 
+For porosity prediction, we achieved the followin g metrics value for each 
+model. 
+Model R2 RMSE MAE 
+Linear Regression 0.8198 0.0733 0.0494 
+SVR 0.8846 0.0586 0.0508 
+Random Forest 0.9957 0.0113 0.0051 
+XGBoost 0.989 0.0181 0.0112 
+Deep Neural Network 0.9866 0.02 0.0107 
+ 
+Table 4.1: Metrics Value of Porosity Prediction of Well 10 
+ 
+Model R2 RMSE MAE 
+Linear Regression 0.8515 0.0716 0.0537 
+SVR 0.9148 0.0542 0.046 
+Random Forest 0.9891 0.0194 0.0086 
+XGBoost 0.9848 0.0229 0.0148 
+Deep Neural Network 0.9821 0.0249 0.0148 
+ 
+Table 4.2: Metrics Value of Porosity Prediction of Well 11 
+ 
+Model R2 RMSE MAE 
+Random Forest 0.9924 0.01535 0.00685 
+XGBoost 0.9869 0.0205 0.013 
+Deep Neural Network 0.98435 0.02245 0.01275 
+SVR 0.8997 0.0564 0.0484 
+Linear Regression 0.83565 0.07245 0.05155 
+ 
+Table 4.3: Metrics Value of Porosity Prediction (Average) 
+ 
+Visualization of results can be done by plotting Actual versus Predicted values. 
+
+
+--- PAGE 53 ---
+ 
+Chapter 4: RESULT 39 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.1: Linear Regression (Porosity) – Well 10 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.2: Linear Regression (Porosity) – Well 11 
+
+
+
+--- PAGE 54 ---
+ 
+Chapter 4: RESULT 40 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.3: Support Vector Regression (Porosity) – Well 10 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.4: Support Vector Regression (Porosity) – Well 11 
+
+
+
+--- PAGE 55 ---
+ 
+Chapter 4: RESULT 41 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.5: Random Forest (Porosity) – Well 10 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.6: Random Forest (Porosity) – Well 11 
+
+
+
+--- PAGE 56 ---
+ 
+Chapter 4: RESULT 42 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.7: XGBoost (Porosity) – Well 10 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.8: XGBoost (Porosity) – Well 11 
+
+
+
+--- PAGE 57 ---
+ 
+Chapter 4: RESULT 43 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.9: Deep Neural Network (Porosity) – Well 10 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.10: Deep Neural Network (Porosity) – Well 11 
+
+
+
+--- PAGE 58 ---
+ 
+Chapter 4: RESULT 44 
+4.2 PERMEABILITY PREDICTION 
+ 
+For permeability, the metrics values are shown in the following tables. 
+ 
+ 
+Model R2 RMSE MAE 
+Linear Regression 0.5924 0.152 0.1058 
+SVR 0.7622 0.1161 0.0735 
+Random Forest 0.8543 0.0909 0.0454 
+XGBoost 0.8077 0.1044 0.0562 
+Deep Neural Network 0.805 0.1052 0.056 
+ 
+ 
+Table 4.4: Metrics Value of Permeability Prediction of Well 10 
+ 
+ 
+Model R2 RMSE MAE 
+Linear Regression 0.6524 0.1145 0.0847 
+SVR 0.8822 0.0667 0.0468 
+Random Forest 0.9023 0.0607 0.0343 
+XGBoost 0.8932 0.0635 0.0412 
+Deep Neural Network 0.9039 0.0602 0.0389 
+ 
+Table 4.5: Metrics Value of Permeability of Well 11 
+ 
+ 
+Model R2 RMSE  MAE  
+Random Forest 0.8783 0.0758 0.0399 
+Deep Neural Network 0.8545 0.0827 0.0475 
+XGBoost 0.8505 0.084 0.0487 
+SVR 0.8222 0.0914 0.0602 
+Linear Regression 0.6224 0.1332 0.0952 
+ 
+Table 4.6: Metrics Value of Permeability (Average) 
+ 
+Scatter Plots of Actual versus Predicted values are plotted as well to visualize 
+the metrics value of permeability. 
+ 
+
+
+--- PAGE 59 ---
+ 
+Chapter 4: RESULT 45 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.11: Linear Regression (Permeability) – Well 10 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.12: Linear Regression (Permeability) – Well 11 
+
+
+
+--- PAGE 60 ---
+ 
+Chapter 4: RESULT 46 
+ 
+Fig 4.9: Support Vector Regression (Permeability) 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.13: SVR (Permeability) – Well 10 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.11: Random Forest (Permeability) 
+ 
+ 
+ 
+Fig 4.14: SVR (Permeability) – Well 11 
+
+
+
+--- PAGE 61 ---
+ 
+Chapter 4: RESULT 47 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.12: XGBoost (Permeability) 
+ 
+ 
+Fig 4.15: Random Forest (Permeability) – Well 10 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.16: Random Forest (Permeability) – Well 11 
+
+
+
+--- PAGE 62 ---
+ 
+Chapter 4: RESULT 48 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.17: XGBooost (Permeability) – Well 10 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.18: XGBooost (Permeability) – Well 11 
+ 
+
+
+
+--- PAGE 63 ---
+ 
+Chapter 4: RESULT 49 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.19: Deep Neural Network (Permeability) – Well 10 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.20: Deep Neural Network (Permeability) – Well 11 
+
+
+
+--- PAGE 64 ---
+ 
+Chapter 4: RESULT 50 
+ 
+ 
+4.3 WATER SATURATION PREDICTION 
+ 
+The matric values for water saturation are given at table below: 
+ 
+ 
+Model R2 RMSE MAE 
+Linear Regression 0.7847 0.0737 0.0537 
+SVR 0.8556 0.0603 0.0513 
+Random Forest 0.9564 0.0332 0.0177 
+XGBoost 0.9386 0.0394 0.0239 
+Deep Neural Network 0.9549 0.0337 0.0204 
+ 
+ 
+Table 4.7: Metrics Values of SW Prediction of Well 10 
+ 
+Model R2 RMSE MAE 
+Linear Regression 0.8126 0.0689 0.0525 
+SVR 0.8958 0.0514 0.0412 
+Random Forest 0.9742 0.0256 0.0158 
+XGBoost 0.9614 0.0313 0.0207 
+Deep Neural Network 0.9812 0.0218 0.0136 
+     
+Table 4.8: Metrics Values of SW Prediction of Well 11 
+ 
+ 
+Model R2 RMSE MAE 
+Deep Neural Network 0.9681 0.0278 0.017 
+Random Forest 0.9653 0.0294 0.0168 
+XGBoost 0.95 0.0354 0.0223 
+SVR 0.8757 0.0559 0.0463 
+Linear Regression 0.7986 0.0713 0.0531 
+ 
+ 
+Table 4.9: Metrics Values of SW Prediction (Average) 
+ 
+ 
+The scatter plots also used here to visualize the  metric values of water 
+saturation. 
+
+
+--- PAGE 65 ---
+ 
+Chapter 4: RESULT 51 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.21: Linear Regression (Water Saturation) – Well 10 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.22: Linear Regression (Water Saturation) – Well 11 
+ 
+
+
+
+--- PAGE 66 ---
+ 
+Chapter 4: RESULT 52 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.23: SVR (Water Saturation) Well 10 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.24: SVR (Water Saturation) Well 11 
+
+
+
+--- PAGE 67 ---
+ 
+Chapter 4: RESULT 53 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.25: Random Forest (Water Saturation) Well 10 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.26: Random Forest (Water Saturation) Well 11 
+
+
+
+--- PAGE 68 ---
+ 
+Chapter 4: RESULT 54 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.27: XGBoost (Water Saturation) Well 10 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.28: XGBoost (Water Saturation) Well 11 
+
+
+
+--- PAGE 69 ---
+ 
+Chapter 4: RESULT 55 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.29: Deep Neural Network (Water Saturation) Well 10 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 4.30: Deep Neural Network (Water Saturation) Well 11
+
+
+
+--- PAGE 70 ---
+
+
+
+--- PAGE 71 ---
+ 
+Chapter 5: DISCUSSION 57 
+Chapter 5: DISCUSSION 
+5.1 GENERAL 
+In this study, five different machine learning models of each class were used to 
+check the efficiency in predicting three parameters of reservoir, which are 
+porosity, permeability and water saturation. To evaluate the performance of t he 
+models, R 2, RMSE and MAE  were measured and recorded in  the tables of 
+chapter 4. For further visualization of the performance of the se models, 
+histograms were used. 
+ 
+5.2 POROSITY PREDICTION EVALUATION 
+ 
+Among the five models, Random Forest  performed overall b est with lowest 
+average RMSE (0.01535), lowest average MAE (0.00685) and highest average R2 
+(0.9924), reflecting high accuracy and reliabi lity in predicting porosity. XGBoost 
+outperformed Deep Neural Network with an average R2 (0.9869), average MAE 
+(0.013) and average RMSE ( 0.0205) score. Deep Neural Network  achieved 
+average R2 (0.98435), average MAE (0.01275)  and average RMSE (0.02245) score 
+respectively. Rest of the models have very lower average R2 value compare to 
+these three. However SVR has outperform ed Linear Regression model , with  
+average R2 (0.8997), average RMSE ( 0.0564) and  average MAE ( 0.0484) score.  
+Lastly Linear Regression model scored the lowest  average R2 (0.83565), highest 
+average RMSE (0.07245) and highest average MAE (0.05155) score. 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+--- PAGE 72 ---
+ 
+Chapter 5: DISCUSSION 58 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 5.1: Comparison of Evaluation Metrics for Porosity 
+ 
+ 
+5.3 PERMEABILITY PREDICTION EVALUATION 
+ 
+In permeability prediction, Random Forest  again performed ove rall best with 
+lowest average RMSE (0.0758 ), lowest average MAE (0.0399)  and highest  
+average R2 (0.8783) score . But Deep Neural Network outperformed XGBoost 
+with average  R2 (0.8545), average RMSE ( 0.0827) and average MAE ( 0.0475) 
+score. Moderate performance was achieved by XGBoost with average R2 
+(0.8505), average RMSE (0.084) and average MAE (0.0487) score. SVR has again 
+outperformed Linear Regression , with  average R2 (0.8222), average RMSE 
+(0.0914) and average MAE (0. 0602) score. Linear Regression  model achieved 
+very low average R2 (0.6224), average RMSE (0.1332) and average MAE (0.0952) 
+score, indicating inefficiency in predicting permeability.  
+ 
+ 
+ 
+ 
+ 
+
+
+
+--- PAGE 73 ---
+ 
+Chapter 5: DISCUSSION 59 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 5.2: Comparison of Evaluation Metrics for Permeability 
+ 
+ 
+5.4 WATER SATURATION PREDICTION EVALUATION 
+ 
+In water saturation prediction, Deep Neural Network outperformed Random 
+Forest by a small margin. Deep Neural Network achieved overall best with 
+lowest average RMSE (0.0278), lowest average MAE (0.017) and highest average 
+R2 (0.9681) score. . Random Forest model achieved average R 2 (0.9653), average 
+RMSE (0.0294) and average MAE (0.0168) score. XGBoost was the third best 
+model with average R2 (0.95), average RMSE (0.0354) and average MAE (0.0223) 
+score. Lastly SVR outperformed Linear Regression model, with average R 2 
+(0.8757), average RMSE (0.0559 ) and average MAE (0.0 463) score. Linear 
+Regression model achieved average R 2 (0.7986), RMSE (0. 0713) and MAE 
+(0.0531) score, suggesting Linear Regression should not be used as a tool to 
+predict reservoir characterization.  
+ 
+ 
+ 
+
+
+
+--- PAGE 74 ---
+ 
+Chapter 5: DISCUSSION 60 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 5.3: Comparison of Evaluation Metrics for Water Saturation 
+ 
+ 
+5.5 OVERALL PREDICTION EVALUATION 
+ 
+Random Forest, XGBoost, and  Deep Neural Network  have outperformed the 
+rest of the models in term of all three sectors. But this  margin was 
+comparatively very narrow. Thus a radar plot was used to visualize the best 
+model among these three in term of predicting porosity, permeability and water 
+saturation all together. To plot radar graph, R 2 value is taken as key 
+performance parameter as it is widely accepted better performance evaluation 
+metrics. The scale of R 2 was normal ized with a max va lue of 0.9950  and min 
+value of 0.80 in order to have a clear visualization. The model that has the most 
+area covered on the circle  will be considered as the best model in term of 
+reservoir characterization prediction. 
+ 
+ 
+
+
+
+--- PAGE 75 ---
+ 
+Chapter 5: DISCUSSION 61 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 5.4: Radar Plot of R2 
+ 
+Model Area Covered Performance 
+Random Forest 0.6811 Best 
+Deep Neural Network 0.5716 Excellent 
+XGBoost 0.4623 Fair 
+ 
+Table 5.1: Area Covered in Radar 
+ 
+
+
+
+--- PAGE 76 ---
+ 
+Chapter 5: DISCUSSION 62 
+From the graph, the area of each triangle was calculated,  Random Forest  
+covered the maximum area (0. 6811), reflecting the best model for reservoir 
+characterization. Deep Neural Network  covered the area (0. 5716) more than 
+XGBoost, reflecting as the second best model for reservoir characterization. 
+Lastly XGBoost has less area (0.4623) compare to other two. 
+ 
+Parameter Prediction Best Model 
+Porosity Random Forest 
+Permeability Random Forest 
+Water Saturation Deep Neural Network 
+Reservoir Characterization Random Forest 
+ 
+Table 5.2: Best Predictive Model for each section 
+ 
+ 
+ 
+5.6 SHAP Value and Important Features 
+ 
+This study also focuses on selecting the important features of each target 
+variables  as selecting the most relevant features can reduce computational costs 
+and enhance the overall model performance. 
+ 
+One of the widely used and most common methods for feature importance 
+analysis is Shapley Additive explanations, shortly known as SHAP. SHAP 
+values assign importance scores to each input parameter. This score reflects a 
+clear insight into how input parameters influence the model’s predic tions. This 
+approach not only enhances interpretability but also helps ensure that ML 
+models align with geological principles.  
+ 
+For simplicity, the SHAP analysis was only conducted using  Random Forest on 
+well 11, as the parameters of well 10 are almost identical to well 11. 
+ 
+
+
+--- PAGE 77 ---
+ 
+Chapter 5: DISCUSSION 63 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 5.5: SHAP Value for Porosity  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 5.6: SHAP Value for Permeability 
+
+
+
+--- PAGE 78 ---
+ 
+Chapter 5: DISCUSSION 64 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+Fig 5.7: SHAP Value for Water Saturation 
+ 
+ 
+5.7 Regression Analysis 
+ 
+Regression analysis was conducted using Gen eXpro tool software to visualize 
+the relationship between parameters and the target variable in a mathematical 
+function. The parameters were chosen based on the SHAP analysis and it was 
+only conducted with well 11. Well no 10 was used to validate the equat ion. The 
+finding relationships are stated at this section. 
+ 
+ For effective porosity,  important features are neut ron porosity, density 
+porosity, bulk density log and density correction. The relationship is given 
+below: 
+ 
+
+
+
+--- PAGE 79 ---
+ 
+Chapter 5: DISCUSSION 65 
+     (          (                        ))
+ ((√              
+ 
+)
+ 
+          *       
+ 
+Where, 
+DPHI = Effective Porosity 
+NPHI = Neutron Porosity 
+DRHO = Density Correction 
+DPOR = Density Porosity 
+RHOB = Bulk Density Log 
+ 
+ 
+ 
+For permeability, the most important features were neutron porosity, density 
+porosity, density correction, bulk density log, induction deep log and depth. 
+ 
+     (                                   )
+ (                                   
+ )
+                                    
+ 
+ 
+Where, 
+PERM = Permeability 
+NPHI = Neutron Porosity 
+DPOR = Density Porosity 
+DRHO = Density Correction 
+ILD = Induction Deep Log 
+ 
+
+
+--- PAGE 80 ---
+ 
+Chapter 5: DISCUSSION 66 
+ 
+For water saturation, important features are induction deep log or resistivity 
+log, neutron porosity, bulk density log, density correction, density log and bulk 
+density. The relationship of water saturation with these parameters is: 
+ 
+   (((                  )     )            *
+ (
+√    (                  
+ *              
+ )
+  
+ (          
+(             √   )
+) 
+ 
+Where, 
+SW = Water Saturation 
+ILD = Induction Deep Log 
+NPHI = Neutron Porosity 
+DRHO = Density Correction 
+DPOR = Density Porosity 
+ 
+These equations highlight the relationship of porosity, permeability and water 
+saturation with well log parameters. These can be an effective way to calculate 
+porosity, permeability and water saturation with these equations. Howeve r, it 
+should be noted as well that, for simplicity this experiment was only conducted 
+with well 11. Thus for generalization, it requires  to conduct the same research 
+with identical parameters in different format ions and wells. Also the R 2 value 
+for the per meability model was not impressive, and it is also very difficult to 
+predict permeability based on well log data. Core data analysis is required to 
+estimate the permeability precisely. Permeability of a formation varies 
+significantly from other formations. 
+ 
+ 
+ 
+
+
+--- PAGE 81 ---
+ 
+Chapter 5: DISCUSSION 67 
+5.8 Limitations, Opportunities, and Reliability of ML Approach 
+ 
+Machine learning models used in this study, can predict porosity, permeability 
+and water saturation at certain degree of accuracy. However there are some 
+limitations of this process as well. Th is section discusses the limit ation, 
+opportunities and reliability of this study. 
+ 
+5.8.1 Limitation 
+Limitations of the machine learning approach are given below: 
+ ML models require large volumes of high quality data to predict with 
+high degree accuracy. But similarly to many real-world reservoirs, Titas 
+Gas Field well log  data may be incomplete, noisy and full of missing 
+data, especially for permeability and water saturation. 
+ 
+ In many formations permeability fluctuates at very high degree, thus 
+predicting permeability in some formation may be difficult with those 
+models. 
+ 
+ Due to geological heterogeneity, the model may not be generalized for 
+other field as well. 
+ 
+ Without careful pre-processing and validation, models may overfit to 
+training data, reducing the effectiveness of the prediction 
+ 
+ Core Data was absent from the dataset, thus the study has to rely on 
+empirical equations . The assumption taken to utilize those equation, 
+sometime mismatched from real reservoir condition 
+ 
+ The study was focused on only two wells of Titas Gas Field, for better 
+generalization, data from multiple well is required. 
+
+
+--- PAGE 82 ---
+ 
+Chapter 5: DISCUSSION 68 
+ 
+ Based on only five models, other models such as CatBoost, LIghtGBM, 
+Decision Tree, ANN etc. can be implemented as well. 
+ 
+5.8.2 Opportunities of ML Approach 
+There are several opportunities of machine learning approach. These are 
+discussed in the following section: 
+ 
+ Machine learning models can predict the target variables of all well 
+across a formation, once it is trained. 
+ The estimation using machine learning models are quite fast and reliable. 
+ ML models can detect non -linear relationships as well as complex 
+patterns among the various parameters of the formation. 
+ It is cost effective and can be used for real time application. 
+ The models reduce the human error s, enhancing more automation 
+approach. 
+ ML models can combine core data, well log data, seismic data, 
+production data to improve accuracy and robustness. 
+ 
+ With some advanced models, 90% or more than that accuracy achieved. 
+ 
+5.8.3 Reliability  
+ 
+Considering both  of the limitations and opportunities  of machine learning 
+approach, the Random Forest model  can be effective tool s to predict res ervoir 
+characteristics, as it achieved high degree of accuracy . Bu t this accuracy may 
+vary according to the characteristics of the formation. Each formation has its 
+unique characteristics, thus even though predicting properties using machine 
+learning is fast and cost effective process, but no major decision should be tak en 
+based on solely machine learning models. Instead they can be used as a 
+complementary tool alongside the traditional conventional methods. 
+
+
+--- PAGE 83 ---
+ 
+Chapter 6: CONCLUSION 69 
+Chapter 6: CONCLUSION 
+6.1 Conclusion 
+In this study, five different machine learning models  of different classes  were 
+used to predi ct three major reservoir properties, which are porosity, 
+permeability and water saturation. Random forest outperformed all the other 
+models to predict all parameters  with highest accuracy followed by Deep 
+Neural Network  and Xgboost respectively. For permea bility and porosity 
+prediction Random Forest  outperformed rest of the models. Deep Neural 
+Network achieved highest accuracy in water saturation prediction. Xgboost can 
+also be used as the alternatives of Random Forest. 
+ 
+This study not only shows the most effective model for reservoir prediction, but 
+also shows that models like Linear regression, Support vector regression should 
+not be used as predictive model for reservoir characterization as they achieved 
+very low degree of accuracy. This is obvious as those models are based on linear 
+relationship between parameters. But in real time reservoir, the parameters 
+maintain a non -linear relationship with one another.  Models like Random 
+forest, Xgboost, Deep Neural Network  can handle the non -linear relationship, 
+thus those achieved higher accuracy. Also permeability of a formation depends 
+less on well logs parameters, thus lower accuracy was achieved here by all 
+models. Having core data, could have influenced the permeability prediction 
+even better. Even though wit h Random Forest, XGBoost and Deep Neural 
+Network achieved 90-95% accuracy, but the limitation of the study and 
+reliability of the models should also be considered. Thus it is recommended to 
+use those models as a complementary tool alongside the traditional methods. 
+ 
+6.2 Recommendation for the Further Study 
+In t his study, gradient models like  Xgboost, L inear models like Linear 
+Regression, Support Vector Matrix models like Support Vector Regression, 
+decision tree assemble based models like Random Forest and deep learning 
+model like Deep Neural Network were used.  Even though, four different types 
+
+
+--- PAGE 84 ---
+ 
+Chapter 6: CONCLUSION 70 
+of model type s were used, but there are several other models such as 
+LightGBM, Gaussian Process Regression, K -Nearest Neighbors Regression , 
+CatBoost can be considered as well.  
+ 
+Also this study can be conducted to other fields and wells as well to enhance 
+the reliability of those models. Furthermore, this study ignores the lithological 
+classification for reservoir characterization, which can be studied as well. 
+Working with large range of dataset can open the possibilities for many deep 
+learning models as well. Working along with core data, can also provide better 
+accuracy and more insights of the formation as well. 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+
+
+--- PAGE 85 ---
+ 
+REFERENCES 71 
+REFERENCES  
+[1] F. Hadavimoghaddam, M. Ostadhassan, M. A. Sadri, M. Salehi, and M. R. Islam, 
+"Prediction of Water Saturation from Well Log Data by Machine Learning 
+Algorithms: Boosting and Super Learner," Journal of Marine Science and 
+Engineering, vol. 9, no. 6, p. 666, 2021. 
+ 
+[2] Y. Zhang, Y. Li, and Y. Wang, "Petrophysical Regression regarding Porosity, 
+Permeability, and Water Saturation Driven by Logging-Based Ensemble and 
+Transfer Learnings: A Case Study of Sandy-Mud Reservoirs," Geofluids, vol. 
+2022, Article ID 9443955, 2022. 
+ 
+[3] A. Cheddad, "Predicting Permeability from Well Log Data Using Machine Learning 
+Techniques," Journal of Petroleum Exploration and Production Technology, vol. 
+13, pp. 123–135, 2023. 
+ 
+[4] A. B. Nugroho, T. Haryono, and S. P. Santoso, "Application of Random Forest and 
+XGBoost Algorithms for Predicting Effective Porosity and Permeability in 
+Sandstone Reservoirs," Journal of Natural Gas Science and Engineering, vol. 75, p. 
+103123, 2024. 
+ 
+[5] J. E. Smith, L. M. Johnson, and P. R. Williams, "Enhanced Petrophysical Evaluation 
+Through Machine Learning and Well Log Interpretation," Petroleum Science and 
+Technology, vol. 42, no. 5, pp. 789–803, 2024. 
+ 
+[6] A. Youcefi, M. Boudella, and S. Amara, "Enhancing Porosity Prediction Using 
+Stacking Ensemble Machine Learning Techniques," Journal of Petroleum Science 
+and Engineering, vol. 219, p. 111002, 2024. 
+ 
+[7] M. Rahimi, A. R. Soltanian, and M. Sahimi, "Facies Classification Using Random 
+Forest and Geostatistical Modeling," Journal of Hydrology, vol. 610, p. 127825, 
+2022. 
+ 
+[8] D. A. Wood, "Predicting Porosity, Permeability, and Water Saturation Applying an 
+Optimized Nearest-Neighbour Machine Learning and Data-Mining Network of 
+Well-Log Data," Natural Resources Research, vol. 33, pp. 456–472, 2024. 
+ 
+
+
+--- PAGE 86 ---
+ 
+REFERENCES 72 
+[9] E. E. Nyakilla, J. K. Mwangi, and L. O. Ochieng, "Comparative Analysis of 
+AdaBoost and Other Machine Learning Models in Evaluating Porosity and 
+Permeability," Journal of Energy Resources Technology, vol. 146, no. 2, p. 
+023001, 2024. 
+ 
+[10] A. Reza, M. M. Rahman, and M. A. Islam, "Petrophysical Analysis for Reservoir 
+Characterization of Rashidpur Gas Field, Bangladesh," Journal of Geological 
+Society of India, vol. 82, pp. 413–420, 2013. 
+ 
+[11] M. S. Shah, M. A. Hossain, and M. M. Rahman, "Petrophysical Evaluation of Titas 
+Gas Field Using Quick Log Analysis Tool (QLAT)," Journal of Petroleum 
+Exploration and Production Technology, vol. 11, pp. 2345–2358, 2021. 
+ 

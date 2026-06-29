@@ -224,6 +224,11 @@ All thesis-ready graphs were saved in `ml_outputs/thesis_graphs/`. A combined PD
 
 Generated figures:
 
+- `13_boxplot_outliers_before_treatment.png`: boxplot for input-feature outliers before IQR treatment.
+- `14_boxplot_outliers_after_treatment.png`: boxplot for input-feature outliers after IQR treatment.
+- `15_histogram_duplicate_data.png`: histogram/bar chart showing duplicate data by column and full-row duplicate count.
+- `16_scattered_plot_noisy_data_all_inputs.png`: scattered plot for IsolationForest noisy-data detection across all input logs.
+- `17_scattered_plot_noisy_data_key_logs.png`: scattered plot for noisy-data detection on key well-log curves.
 - `01_target_property_distributions.png`: histograms for porosity, log permeability, and water saturation.
 - `02_depth_profiles_logs_and_targets.png`: well-log and reservoir-property profiles versus depth.
 - `03_correlation_heatmap.png`: Pearson correlation heatmap for major logs and target properties.
