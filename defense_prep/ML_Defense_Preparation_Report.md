@@ -487,7 +487,455 @@ No. ANN was best only for permeability. Random Forest was best for porosity and 
 
 Because the purpose was comparative model evaluation. Different algorithms were tested so the final selection is evidence-based.
 
-## 27. One-Day Practice Plan
+## 27. Extended Viva Question Bank
+
+This section contains additional possible questions. The presenter does not need to memorize every answer word for word. The goal is to understand the logic behind each answer.
+
+### Q31. What type of machine learning problem is this?
+
+This is a supervised regression problem. It is supervised because the input logs and target reservoir properties are both available during training. It is regression because the targets are continuous numerical values: porosity, permeability, and water saturation.
+
+### Q32. What is the difference between classification and regression?
+
+Classification predicts categories, such as sand or shale. Regression predicts continuous numerical values, such as porosity or permeability. This study used regression because all targets are numerical reservoir properties.
+
+### Q33. What are input features?
+
+Input features are the variables given to the model for prediction. In this study, the input features were well-log curves such as GR, CALI, SP, ILD, SFLU, MSFL, DT, RHOB, DRHO, PEF, NPHI, and depth-derived features.
+
+### Q34. What are target variables?
+
+Target variables are the values the model is trained to predict. In this study, the target variables were porosity, permeability, and water saturation.
+
+### Q35. Why were well logs used as input features?
+
+Well logs provide continuous measurements of rock and fluid responses with depth. Reservoir properties are related to these responses, so well logs can be used as predictors for porosity, permeability, and water saturation.
+
+### Q36. Why was depth included as a feature?
+
+Depth can reflect compaction, formation changes, and vertical geological trends. However, depth must be used carefully because it can make the model learn location-specific patterns. This is one reason depth-ordered validation was used.
+
+### Q37. What is data leakage?
+
+Data leakage occurs when information from the test set is indirectly used during training. In well-log data, random splitting can cause leakage because neighboring depth points are highly similar. Depth-ordered splitting reduces this risk.
+
+### Q38. Why is random split risky for well-log data?
+
+Random split can place adjacent depth samples into both training and testing sets. Since adjacent samples are similar, the model may appear highly accurate even though it has not truly generalized to a new depth interval.
+
+### Q39. What does depth-holdout test prove?
+
+It checks whether the model can predict a deeper unseen interval after learning from earlier depth intervals. This gives a stricter and more realistic estimate of performance along the well profile.
+
+### Q40. What does five-fold depth-ordered cross-validation prove?
+
+It checks whether the model performs consistently across multiple sequential depth intervals. It is mainly a stability check.
+
+### Q41. Which result is more important: CV or final test?
+
+Both are important, but they answer different questions. CV checks stability. The final depth-holdout test is used for final model selection because it represents an unseen depth interval.
+
+### Q42. Why can a model perform well in CV but not be the best in final test?
+
+The CV score is an average across multiple folds, while the final test is one specific unseen depth interval. If the final interval has different geological behavior, a different model may perform better there.
+
+### Q43. Why did this study use several algorithms?
+
+Different reservoir properties may have different relationships with logs. Some relationships may be linear, while others may be non-linear. Comparing several models allows evidence-based model selection.
+
+### Q44. Why include Linear Regression if complex models are used?
+
+Linear Regression provides a simple baseline. If complex models cannot outperform it, then complexity is not justified. It also helps identify whether the relationship is approximately linear.
+
+### Q45. Why include Ridge Regression?
+
+Ridge Regression is useful when input features are correlated. It adds regularization, which stabilizes coefficients and reduces overfitting.
+
+### Q46. What is regularization?
+
+Regularization is a penalty added to a model to reduce overfitting. Ridge Regression uses L2 regularization, which discourages very large coefficients.
+
+### Q47. Why can Ridge outperform ordinary Linear Regression?
+
+If the input features are correlated or noisy, ordinary Linear Regression can produce unstable coefficients. Ridge reduces this instability by penalizing large coefficients.
+
+### Q48. Does Ridge Regression capture non-linearity?
+
+Ridge itself is linear. However, if engineered features such as ratios, log transforms, rolling statistics, or interaction terms are added, Ridge can use those transformed inputs. Still, it is not a fully non-linear model like Random Forest or ANN.
+
+### Q49. Why use Random Forest?
+
+Random Forest can model non-linear relationships and feature interactions. It is robust for tabular data and less sensitive to noise than a single decision tree.
+
+### Q50. What is the difference between Random Forest and one decision tree?
+
+One decision tree can overfit easily. Random Forest builds many trees and averages their predictions, reducing variance and improving generalization.
+
+### Q51. Why use Extra Trees?
+
+Extra Trees adds more randomness than Random Forest when splitting nodes. This can reduce variance and sometimes improve performance.
+
+### Q52. Why use XGBoost?
+
+XGBoost is a powerful boosting algorithm. It builds trees sequentially, where each new tree tries to correct errors made by previous trees. It often performs well on structured tabular data.
+
+### Q53. What is the difference between Random Forest and XGBoost?
+
+Random Forest builds many trees independently and averages them. XGBoost builds trees sequentially, with each tree correcting previous errors.
+
+### Q54. Why use SVR?
+
+SVR is useful for regression problems and can model non-linear relationships using kernels. It was included to compare kernel-based learning with tree-based and neural-network models.
+
+### Q55. Why might SVR perform worse?
+
+SVR can be sensitive to feature scaling, hyperparameters, and dataset size. If the selected parameters are not ideal or the relationship is complex, it may underperform.
+
+### Q56. Why use ANN Deep MLP?
+
+ANN can learn complex non-linear relationships between logs and target properties. It is useful when the target depends on hidden interactions that are difficult to express with simple equations.
+
+### Q57. Why did ANN perform best for permeability?
+
+Permeability depends on pore connectivity, pore throat geometry, sorting, fractures, and flow pathways. These controls are more complex and non-linear than simple porosity trends. ANN likely captured part of this complexity better in the final test interval.
+
+### Q58. Why did Random Forest perform best for porosity?
+
+Porosity is strongly related to density, neutron, sonic, and shale-related logs. Random Forest can capture interactions between these logs and handle non-linear behavior, which explains its strong performance.
+
+### Q59. Why did Random Forest perform best for water saturation?
+
+Water saturation is controlled by resistivity response, porosity, lithology, and fluid distribution. Random Forest can combine these log responses effectively and is robust to noise.
+
+### Q60. Why was Baseline Mean included?
+
+Baseline Mean provides a minimum reference. It predicts the average target value. If ML models perform better than baseline, they are learning useful patterns from the logs.
+
+### Q61. What does a negative R2 mean?
+
+Negative R2 means the model performs worse than simply predicting the mean value. It indicates poor predictive ability for that target or validation interval.
+
+### Q62. Why is R2 not enough alone?
+
+R2 shows explained variance, but it does not show the actual error size. RMSE, MAE, MAPE, and Pearson correlation are also needed to understand prediction quality.
+
+### Q63. Why use RMSE?
+
+RMSE penalizes large errors more strongly. It is useful when large mistakes are important.
+
+### Q64. Why use MAE?
+
+MAE gives the average absolute error. It is easier to interpret because it is in the same unit as the target.
+
+### Q65. Why use MAPE?
+
+MAPE expresses error as a percentage. It helps compare relative error between targets with different units or scales.
+
+### Q66. Why use Pearson correlation?
+
+Pearson correlation shows whether predicted and actual values follow the same trend. A high Pearson value means the model captures the target trend well.
+
+### Q67. What does high R2 but high RMSE mean?
+
+It can mean the model captures the overall trend but still has large numerical errors. This may happen when the target has a wide range.
+
+### Q68. What does low RMSE but low R2 mean?
+
+It can happen when the target has a small range. The absolute errors are small, but the model may not explain much variation.
+
+### Q69. Why was permeability log-transformed?
+
+Permeability values often have a wide and skewed range. Log transformation reduces the influence of very high values and helps models learn more stable relationships.
+
+### Q70. Were the final reported permeability errors in log units?
+
+No. The model used log-transformed permeability during training, but predictions were converted back to original permeability units for reporting metrics.
+
+### Q71. Why were missing values imputed?
+
+ML models generally cannot train with missing numeric values. Imputation replaces missing inputs with reasonable estimates so that rows can be used.
+
+### Q72. Why use mean imputation?
+
+Mean imputation is simple and consistent with the previous-thesis preprocessing. It works when missing values are limited.
+
+### Q73. What is the weakness of mean imputation?
+
+It can reduce natural variability and may not represent local geological behavior. More advanced methods such as KNN imputation can be tested in future work.
+
+### Q74. Why use IQR clipping instead of deleting all outliers?
+
+Deleting too many rows can reduce data coverage. IQR clipping limits extreme input values while preserving the row for modeling.
+
+### Q75. Why not clip target outliers?
+
+Changing target values can artificially improve scores and weaken academic validity. In this work, physically suspicious targets were flagged but not modified for score inflation.
+
+### Q76. What is IsolationForest?
+
+IsolationForest is an anomaly detection method. It identifies rows that are easier to isolate from the rest of the data, which may indicate noisy or abnormal measurements.
+
+### Q77. Why apply IsolationForest only to input features?
+
+The goal was to remove noisy log-response rows, not manipulate target values. Applying it only to input features keeps the preprocessing more defensible.
+
+### Q78. What is Min-Max scaling?
+
+Min-Max scaling converts variables to a common range, usually 0 to 1. It prevents large-scale variables from dominating scale-sensitive models.
+
+### Q79. Which models are sensitive to scaling?
+
+SVR, ANN, Linear Regression, and Ridge Regression are more sensitive to scaling. Tree-based models are less sensitive, but the same preprocessing pipeline was kept for consistency.
+
+### Q80. Why use correlation-based feature selection?
+
+It removes weak or redundant features and keeps the inputs most related to the target. This can reduce overfitting and improve interpretability.
+
+### Q81. What is multicollinearity?
+
+Multicollinearity means two or more input features are highly correlated. It can make linear-model coefficients unstable.
+
+### Q82. How was multicollinearity handled?
+
+Highly correlated features were checked and redundant features were reduced using a correlation threshold.
+
+### Q83. Why do different targets have different selected features?
+
+Porosity, permeability, and water saturation are controlled by different physical mechanisms. Therefore, the most useful log features can differ for each target.
+
+### Q84. What is overfitting in this study?
+
+Overfitting would mean the model learns local patterns or noise from the training interval but fails on unseen depth intervals.
+
+### Q85. How was overfitting checked?
+
+Depth-holdout testing and depth-ordered cross-validation were used. If a model performs well in training but poorly in unseen depth intervals, it may be overfitting.
+
+### Q86. What is underfitting?
+
+Underfitting means the model is too simple to capture the relationship between logs and reservoir properties. It performs poorly even in validation.
+
+### Q87. Why can a simple model sometimes perform well?
+
+If the dominant relationship is approximately linear or the engineered features already capture important trends, a simple model can perform well and generalize better.
+
+### Q88. Does high model accuracy mean the model is physically perfect?
+
+No. It means the model predicted the prepared target data well. Physical reliability still depends on target quality, core calibration, and geological representativeness.
+
+### Q89. What is the biggest limitation of this ML work?
+
+The targets are mostly derived from formulas, with limited core replacement. More measured core data would provide stronger independent validation.
+
+### Q90. Why is core data important?
+
+Core data provides direct laboratory measurement of rock properties. It can be used to calibrate or validate log-derived and ML-predicted properties.
+
+### Q91. Are formula-derived targets a problem?
+
+They are acceptable for a comparative ML study, but they limit independent validation. The model may learn relationships already embedded in the formulas.
+
+### Q92. How should this limitation be stated?
+
+The study predicts prepared petrophysical target values derived from logs and core replacement where available. Future work should include more measured core data for stronger independent validation.
+
+### Q93. Why are empirical formulas still important?
+
+Empirical formulas provide physical basis and interpretability. ML should be treated as a complementary tool, not a replacement for petrophysical reasoning.
+
+### Q94. How can ML and empirical formulas work together?
+
+Empirical formulas can generate initial estimates, while ML can learn corrections or patterns from multi-log responses and core-calibrated data.
+
+### Q95. What if a teacher says ML is a black box?
+
+Some models are less interpretable, especially ANN. However, feature importance, correlation analysis, predicted-vs-actual plots, and residual plots were used to interpret behavior.
+
+### Q96. Which model is most interpretable?
+
+Linear Regression and Ridge Regression are most interpretable because they use coefficients. Random Forest is moderately interpretable using feature importance. ANN is less interpretable.
+
+### Q97. Why choose ANN if it is less interpretable?
+
+ANN was selected for permeability because it gave the best final test performance. Model selection was based on performance, while limitations in interpretability were acknowledged.
+
+### Q98. What graph is most important for final result?
+
+The best model summary table and predicted-vs-actual plots are most important for showing model performance. The CV R2 graph is important for showing stability.
+
+### Q99. What does a predicted-vs-actual plot show?
+
+It compares model predictions with actual target values. Points close to the 1:1 line indicate good prediction.
+
+### Q100. What does a residual plot show?
+
+It shows prediction error across depth. A good model should have residuals scattered around zero without strong systematic bias.
+
+### Q101. What does the correlation heatmap show?
+
+It shows relationships between input logs and target properties. It supports feature selection and helps identify important variables.
+
+### Q102. What does the boxplot before and after outlier treatment show?
+
+It shows how input-feature outliers were reduced by IQR treatment. The before plot shows extreme values, and the after plot shows a more controlled feature range.
+
+### Q103. What does the duplicate histogram show?
+
+It shows duplicate values by column and full-row duplicate count. This supports the duplicate-data checking step.
+
+### Q104. What does the noisy-data scatter plot show?
+
+It shows rows detected as noisy or anomalous by IsolationForest. These points are highlighted against normal log responses across depth.
+
+### Q105. Why were graphs included?
+
+Graphs make the workflow transparent. They show preprocessing effects, model comparison, prediction quality, residual behavior, and feature importance.
+
+### Q106. What is the practical use of this research?
+
+It can help estimate reservoir properties continuously along a well where direct core data is limited. It can support reservoir characterization and reduce time required for manual interpretation.
+
+### Q107. Can this model be used in another well directly?
+
+Not without validation. A model trained on one well or field may not generalize to another well because lithology, fluid type, and logging conditions can differ.
+
+### Q108. What should be done before applying this model to another well?
+
+The model should be validated with data from that well or field. Ideally, more core data should be used for calibration.
+
+### Q109. What future improvements can be proposed?
+
+Future work can include more wells, more measured core data, lithology classification, hyperparameter optimization, uncertainty analysis, SHAP interpretation, and external validation.
+
+### Q110. What is the final technical contribution of the study?
+
+The study provides a comparative machine learning workflow for predicting porosity, permeability, and water saturation from well-log data using depth-aware validation and model-specific interpretation.
+
+## 28. Rapid-Fire Practice Questions
+
+Use these for quick rehearsal. Answers should be one or two sentences.
+
+### 1. What is the main objective?
+
+To predict porosity, permeability, and water saturation from well-log data using machine learning.
+
+### 2. What type of ML problem is it?
+
+Supervised regression.
+
+### 3. What are the targets?
+
+Porosity, permeability, and water saturation.
+
+### 4. What is the best model for porosity?
+
+Random Forest.
+
+### 5. What is the best model for permeability?
+
+ANN Deep MLP.
+
+### 6. What is the best model for water saturation?
+
+Random Forest.
+
+### 7. Why is permeability harder?
+
+It depends on pore connectivity and flow pathways, not only pore volume.
+
+### 8. Why use depth-holdout test?
+
+To test model performance on an unseen depth interval and reduce leakage.
+
+### 9. Why use cross-validation?
+
+To check model stability across different depth intervals.
+
+### 10. What is overfitting?
+
+Learning training noise or local patterns too closely, causing poor performance on unseen data.
+
+### 11. What is R2?
+
+A measure of how much target variation is explained by the model.
+
+### 12. What is RMSE?
+
+A prediction-error metric that penalizes large errors.
+
+### 13. What is MAE?
+
+The average absolute prediction error.
+
+### 14. What is MAPE?
+
+The average percentage prediction error.
+
+### 15. What is Pearson r?
+
+Correlation between actual and predicted values.
+
+### 16. Why use Random Forest?
+
+It handles non-linear interactions and performs well on tabular log data.
+
+### 17. Why use ANN?
+
+It can learn complex hidden non-linear relationships.
+
+### 18. Why use Ridge?
+
+It reduces overfitting in linear regression by regularizing coefficients.
+
+### 19. Why use XGBoost?
+
+It is a powerful boosting method for structured data.
+
+### 20. Why use SVR?
+
+It provides a kernel-based regression comparison.
+
+### 21. Why use preprocessing?
+
+To handle missing values, outliers, noise, scale differences, and redundant features.
+
+### 22. Did we manipulate target values?
+
+No. Target values were not changed to improve scores.
+
+### 23. Why use Min-Max scaling?
+
+To put features on a common range.
+
+### 24. Why use feature selection?
+
+To keep useful variables and reduce redundancy.
+
+### 25. What is data leakage?
+
+When test information indirectly enters training.
+
+### 26. Why is random split risky?
+
+Adjacent depth points can appear in both train and test sets.
+
+### 27. What is the limitation?
+
+Targets are mostly formula-derived with limited core replacement.
+
+### 28. What is future work?
+
+Use more wells, more core data, external validation, and uncertainty analysis.
+
+### 29. What is the main conclusion?
+
+Different reservoir properties need different models.
+
+### 30. Is ML replacing petrophysics?
+
+No. It complements petrophysical interpretation.
+
+## 29. One-Day Practice Plan
 
 Use this order for final preparation:
 
@@ -500,7 +948,7 @@ Use this order for final preparation:
 7. Review the graphs: model comparison, CV R2, predicted-vs-actual, residuals, boxplots, duplicate histogram, and noisy-data scatter plots.
 8. Give a two-minute summary of the whole ML workflow without looking at notes.
 
-## 28. Two-Minute Spoken Summary
+## 30. Two-Minute Spoken Summary
 
 This research used well-log data to predict porosity, permeability, and water saturation using machine learning. The input logs included depth, gamma ray, caliper, spontaneous potential, resistivity logs, sonic log, bulk density, density correction, photoelectric factor, and neutron porosity. The data was cleaned using missing-value treatment, duplicate checking, IQR outlier treatment, IsolationForest noisy-data detection, Min-Max scaling, and correlation-based feature selection.
 
